@@ -66,6 +66,14 @@ jobs:
           echo "tag=$NEXT_TAG" >> "$GITHUB_OUTPUT"
           echo "Next release: $NEXT_TAG"
 
+      - name: Decode debug keystore
+        # debug.keystore is .gitignored; the repo ships it as a base64
+        # blob (debug.keystore.base64) that we decode here so AGP's
+        # debugConfig signing config can find it.
+        run: |
+          base64 -d debug.keystore.base64 > debug.keystore
+          ls -la debug.keystore
+
       - name: Build debug APK
         run: |
           chmod +x gradlew
