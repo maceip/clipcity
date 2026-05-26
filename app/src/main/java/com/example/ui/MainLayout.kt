@@ -9,39 +9,29 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.data.VideoJob
 import com.example.ui.navigation.Nav3Controller
 import com.example.ui.navigation.Nav3Host
 import com.example.ui.navigation.Screen
 import com.example.ui.screens.*
-import com.example.ui.theme.RetroCharcoal
-import com.example.ui.theme.RetroCream
 import com.example.ui.viewmodel.VideoViewModel
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.haze
-import top.yukonga.miuix.kmp.basic.CircularProgressIndicator
-import top.yukonga.miuix.kmp.basic.HorizontalDivider
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.basic.LinearProgressIndicator
-import top.yukonga.miuix.kmp.basic.NavigationBar
-import top.yukonga.miuix.kmp.basic.NavigationBarItem
-import top.yukonga.miuix.kmp.basic.NavigationRail
-import top.yukonga.miuix.kmp.basic.NavigationRailItem
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.SmallTopAppBar
-import top.yukonga.miuix.kmp.basic.Surface
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.theme.MiuixTheme
+import dev.chrisbanes.haze.hazeChild
+import dev.chrisbanes.haze.HazeStyle
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainLayout(
     viewModel: VideoViewModel = viewModel()
@@ -54,13 +44,15 @@ fun MainLayout(
     val compression by viewModel.selectedCompression.collectAsState()
     val filter by viewModel.selectedFilter.collectAsState()
 
+    // Determine the active overlay job if selected
     val activeOverlayJobId = nav3Controller.activeJobOverlayId
     val activeJob = jobs.firstOrNull { it.id == activeOverlayJobId }
 
+    // Root layout using BoxWithConstraints to support Pixel Fold & normal Android dynamically
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(MiuixTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         val isWideScreen = maxWidth >= 600.dp
 
@@ -69,25 +61,26 @@ fun MainLayout(
                 .fillMaxSize()
                 .haze(hazeState)
         ) {
-            // Adaptive Navigation Rail for wide layouts (tablets / unfolded foldables)
+            // Adaptive Navigation Component (Navigation Rail for unfolded foldables/tablets)
             if (isWideScreen) {
                 NavigationRail(
-                    color = MiuixTheme.colorScheme.surface,
+                    containerColor = MaterialTheme.colorScheme.surface,
                     modifier = Modifier
-                        .border(width = 2.dp, color = MiuixTheme.colorScheme.outline),
+                        .fillMaxHeight()
+                        .border(width = 2.dp, color = MaterialTheme.colorScheme.outline),
                     header = {
                         Box(
                             modifier = Modifier
                                 .padding(vertical = 16.dp)
                                 .size(48.dp)
                                 .clip(CircleShape)
-                                .background(MiuixTheme.colorScheme.primary),
+                                .background(MaterialTheme.colorScheme.primary),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = "JD",
                                 fontWeight = FontWeight.Black,
-                                color = MiuixTheme.colorScheme.onPrimary,
+                                color = MaterialTheme.colorScheme.onPrimary,
                                 fontSize = 16.sp
                             )
                         }
@@ -96,11 +89,32 @@ fun MainLayout(
                     Spacer(modifier = Modifier.height(12.dp))
                     val mainScreens = listOf(Screen.Monitor, Screen.Gallery, Screen.Queue)
                     mainScreens.forEach { screen ->
+                        val isSelected = nav3Controller.currentScreen == screen
                         NavigationRailItem(
-                            selected = nav3Controller.currentScreen == screen,
+                            selected = isSelected,
                             onClick = { nav3Controller.navigate(screen) },
-                            icon = getScreenIcon(screen),
-                            label = screen.title,
+                            icon = {
+                                Icon(
+                                    imageVector = getScreenIcon(screen),
+                                    contentDescription = screen.title,
+                                    tint = if (isSelected) getScreenColor(screen) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            },
+                            label = {
+                                Text(
+                                    text = screen.title,
+                                    color = if (isSelected) getScreenColor(screen) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                                )
+                            },
+                            colors = NavigationRailItemDefaults.colors(
+                                selectedIconColor = Color.Unspecified,
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurface,
+                                selectedTextColor = Color.Unspecified,
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                                indicatorColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.15f)
+                            )
                         )
                     }
                 }
@@ -110,17 +124,38 @@ fun MainLayout(
             Scaffold(
                 modifier = Modifier.weight(1f),
                 topBar = {
-                    SmallTopAppBar(
-                        title = nav3Controller.currentScreen.title,
-                        color = Color.Transparent,
-                        titleColor = MiuixTheme.colorScheme.onBackground,
+                    TopAppBar(
+                        title = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = nav3Controller.currentScreen.title,
+                                    fontWeight = FontWeight.Black,
+                                    fontSize = 20.sp,
+                                    color = MaterialTheme.colorScheme.onBackground
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(12.dp))
+                                        .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
+                                        .padding(horizontal = 8.dp, vertical = 2.dp)
+                                ) {
+                                    Text(
+                                        text = "V16.1",
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                        },
                         navigationIcon = {
                             if (nav3Controller.backstack.size > 1) {
                                 IconButton(onClick = { nav3Controller.pop() }) {
                                     Icon(
                                         imageVector = Icons.Default.ArrowBack,
                                         contentDescription = "Navigate back",
-                                        tint = MiuixTheme.colorScheme.onBackground
+                                        tint = MaterialTheme.colorScheme.onBackground
                                     )
                                 }
                             } else {
@@ -133,73 +168,88 @@ fun MainLayout(
                             }
                         },
                         actions = {
-                            Box(
-                                modifier = Modifier
-                                    .background(MiuixTheme.colorScheme.primaryContainer, RoundedCornerShape(12.dp))
-                                    .border(1.dp, MiuixTheme.colorScheme.outline, RoundedCornerShape(12.dp))
-                                    .padding(horizontal = 8.dp, vertical = 2.dp)
-                            ) {
-                                Text(
-                                    text = "V16.1",
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MiuixTheme.colorScheme.primary
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(8.dp))
+                            // Shortcuts for secondary setups to completely offload primary menu clutter
                             IconButton(onClick = { nav3Controller.navigate(Screen.Platforms) }) {
                                 Icon(
                                     imageVector = Icons.Default.Share,
                                     contentDescription = "Social Channels Hub",
-                                    tint = if (nav3Controller.currentScreen == Screen.Platforms) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.onBackground
+                                    tint = if (nav3Controller.currentScreen == Screen.Platforms) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
                                 )
                             }
                             IconButton(onClick = { nav3Controller.navigate(Screen.Config) }) {
                                 Icon(
                                     imageVector = Icons.Default.Settings,
                                     contentDescription = "Engine Profiles",
-                                    tint = if (nav3Controller.currentScreen == Screen.Config) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.onBackground
+                                    tint = if (nav3Controller.currentScreen == Screen.Config) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
                                 )
                             }
                             Spacer(modifier = Modifier.width(6.dp))
+                            // Display user avatar badge in header
                             Box(
                                 modifier = Modifier
                                     .padding(end = 12.dp)
                                     .size(32.dp)
                                     .clip(CircleShape)
-                                    .background(MiuixTheme.colorScheme.secondary),
+                                    .background(MaterialTheme.colorScheme.secondary),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
                                     text = "JD",
                                     fontWeight = FontWeight.Bold,
-                                    color = MiuixTheme.colorScheme.onSecondary,
+                                    color = MaterialTheme.colorScheme.onSecondary,
                                     fontSize = 12.sp
                                 )
                             }
                         },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = Color.Transparent
+                        )
                     )
                 },
                 bottomBar = {
+                    // Bottom Navigation Bar for standard portrait screens & folded Pixel Fold configs
                     if (!isWideScreen) {
                         NavigationBar(
-                            color = MiuixTheme.colorScheme.surface,
+                            containerColor = MaterialTheme.colorScheme.surface,
                             modifier = Modifier
-                                .border(width = 2.dp, color = MiuixTheme.colorScheme.outline)
+                                .height(80.dp)
+                                .border(width = 2.dp, color = MaterialTheme.colorScheme.outline)
                         ) {
                             val mainScreens = listOf(Screen.Monitor, Screen.Gallery, Screen.Queue)
                             mainScreens.forEach { screen ->
+                                val isSelected = nav3Controller.currentScreen == screen
                                 NavigationBarItem(
-                                    selected = nav3Controller.currentScreen == screen,
+                                    selected = isSelected,
                                     onClick = { nav3Controller.navigate(screen) },
-                                    icon = getScreenIcon(screen),
-                                    label = screen.title,
+                                    icon = {
+                                        Icon(
+                                            imageVector = getScreenIcon(screen),
+                                            contentDescription = screen.title,
+                                            tint = if (isSelected) getScreenColor(screen) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                    },
+                                    label = {
+                                        Text(
+                                            text = screen.title,
+                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                            fontSize = 11.sp,
+                                            color = if (isSelected) getScreenColor(screen) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                        )
+                                    },
+                                    colors = NavigationBarItemDefaults.colors(
+                                        selectedIconColor = Color.Unspecified,
+                                        unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                                        selectedTextColor = Color.Unspecified,
+                                        unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                                        indicatorColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.15f)
+                                    )
                                 )
                             }
                         }
                     }
                 },
-                containerColor = MiuixTheme.colorScheme.background
+                containerColor = MaterialTheme.colorScheme.background
             ) { innerPadding ->
                 Box(
                     modifier = Modifier
@@ -207,10 +257,12 @@ fun MainLayout(
                         .padding(innerPadding)
                 ) {
                     if (isWideScreen) {
+                        // Supporting Pane layout strategy matching Material 3 Canonical layouts
                         Row(
                             modifier = Modifier.fillMaxSize(),
                             horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
+                            // Left Column: Main Scene Content (60% width)
                             Box(modifier = Modifier.weight(0.6f)) {
                                 Nav3Host(controller = nav3Controller) { currentScreen ->
                                     when (currentScreen) {
@@ -229,13 +281,14 @@ fun MainLayout(
                                     }
                                 }
                             }
-
+                            
+                            // Right Column: Supporting Side Pane (40% width) showing details
                             Box(
                                 modifier = Modifier
                                     .weight(0.4f)
                                     .fillMaxHeight()
-                                    .background(MiuixTheme.colorScheme.surface, RoundedCornerShape(12.dp))
-                                    .border(2.dp, MiuixTheme.colorScheme.outline, RoundedCornerShape(12.dp))
+                                    .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
+                                    .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
                                     .padding(16.dp)
                             ) {
                                 val inlineActiveJob = activeJob
@@ -248,20 +301,21 @@ fun MainLayout(
                                         ) {
                                             Text(
                                                 text = "INLINE TELEMETRY CONSOLE",
-                                                fontSize = 11.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                color = MiuixTheme.colorScheme.primary,
+                                                style = MaterialTheme.typography.labelSmall.copy(
+                                                    fontWeight = FontWeight.Bold, 
+                                                    color = MaterialTheme.colorScheme.primary
+                                                )
                                             )
                                             IconButton(onClick = { nav3Controller.closeOverlay() }) {
                                                 Icon(
-                                                    imageVector = Icons.Default.Close,
+                                                    imageVector = Icons.Default.Close, 
                                                     contentDescription = "Close overlay pane",
-                                                    tint = MiuixTheme.colorScheme.onSurface
+                                                    tint = MaterialTheme.colorScheme.onSurface
                                                 )
                                             }
                                         }
                                         Spacer(modifier = Modifier.height(10.dp))
-
+                                        
                                         VideoFirstFrameSurface(
                                             videoName = inlineActiveJob.originalName,
                                             modifier = Modifier
@@ -280,69 +334,70 @@ fun MainLayout(
                                                 )
                                             }
                                         }
-
+                                        
                                         Spacer(modifier = Modifier.height(14.dp))
-
+                                        
                                         Text(
-                                            text = "Status: ${inlineActiveJob.status}",
-                                            fontWeight = FontWeight.Bold,
+                                            text = "Status: ${inlineActiveJob.status}", 
+                                            fontWeight = FontWeight.Bold, 
                                             fontSize = 14.sp
                                         )
                                         Text(text = "Codec: ${inlineActiveJob.targetCompression}", fontSize = 12.sp)
                                         Text(text = "Platform: ${inlineActiveJob.socialPlatform}", fontSize = 12.sp)
                                         Text(
-                                            text = "Sync Node: ${inlineActiveJob.cloudSource}",
+                                            text = "Sync Node: ${inlineActiveJob.cloudSource}", 
                                             fontSize = 12.sp
                                         )
-
+                                        
                                         Spacer(modifier = Modifier.height(12.dp))
                                         LinearProgressIndicator(
-                                            modifier = Modifier.fillMaxWidth(),
                                             progress = inlineActiveJob.uploadProgressPercent / 100f,
+                                            modifier = Modifier.fillMaxWidth(),
+                                            color = MaterialTheme.colorScheme.primary
                                         )
                                     }
                                 } else {
                                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                                         Text(
                                             text = "CANONICAL PRESET STATE",
-                                            fontSize = 11.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = MiuixTheme.colorScheme.primary,
+                                            style = MaterialTheme.typography.labelSmall.copy(
+                                                fontWeight = FontWeight.Bold, 
+                                                color = MaterialTheme.colorScheme.primary
+                                            )
                                         )
                                         Text(
                                             text = "Device Multi-Pane Console",
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 16.sp,
+                                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                                         )
-                                        HorizontalDivider(color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.15f))
-
+                                        HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f))
+                                        
                                         Text(text = "Default Crop: ${cropRatio}", fontSize = 13.sp)
                                         Text(text = "Rendering CoDec: ${compression}", fontSize = 13.sp)
                                         Text(text = "Active Filter: ${filter}", fontSize = 13.sp)
-
+                                        
                                         Spacer(modifier = Modifier.height(14.dp))
-
+                                        
                                         Box(
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .background(MiuixTheme.colorScheme.background, RoundedCornerShape(12.dp))
+                                                .background(MaterialTheme.colorScheme.background, RoundedCornerShape(12.dp))
                                                 .padding(12.dp)
                                         ) {
                                             Column {
                                                 Text(
-                                                    text = "BUS HARNESS BUS RATE",
-                                                    fontWeight = FontWeight.Bold,
+                                                    text = "BUS HARNESS BUS RATE", 
+                                                    fontWeight = FontWeight.Bold, 
                                                     fontSize = 11.sp,
-                                                    color = MiuixTheme.colorScheme.secondary
+                                                    color = MaterialTheme.colorScheme.secondary
                                                 )
                                                 Spacer(modifier = Modifier.height(4.dp))
                                                 Text(
-                                                    text = "Inherent TPU Load: ${viewModel.gpuLoad.collectAsState().value}%",
-                                                    fontSize = 11.sp,
+                                                    text = "Inherent TPU Load: ${viewModel.gpuLoad.collectAsState().value}%", 
+                                                    fontSize = 11.sp, 
                                                     fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
                                                 )
                                                 Text(
-                                                    text = "Ingest: ${"%.1f".format(viewModel.ingestSpeed.collectAsState().value)} MB/s",
+                                                    text = "Ingest: ${"%.1f".format(viewModel.ingestSpeed.collectAsState().value)} MB/s", 
                                                     fontSize = 11.sp,
                                                     fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
                                                 )
@@ -353,6 +408,7 @@ fun MainLayout(
                             }
                         }
                     } else {
+                        // Standard viewport navigation host
                         Nav3Host(controller = nav3Controller) { currentScreen ->
                             when (currentScreen) {
                                 Screen.Monitor -> MonitorScreen(
@@ -386,12 +442,12 @@ fun MainLayout(
                     ) {
                         currentlyRunningJob?.let { job ->
                             Surface(
-                                color = MiuixTheme.colorScheme.surface,
+                                color = MaterialTheme.colorScheme.surface,
                                 shape = RoundedCornerShape(12.dp),
                                 shadowElevation = 4.dp,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .border(2.dp, MiuixTheme.colorScheme.outline, RoundedCornerShape(12.dp))
+                                    .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
                                     .clickable { nav3Controller.openOverlay(job.id) }
                             ) {
                                 Row(
@@ -401,13 +457,14 @@ fun MainLayout(
                                     Box(
                                         modifier = Modifier
                                             .size(28.dp)
-                                            .background(MiuixTheme.colorScheme.primary.copy(alpha = 0.15f), CircleShape),
+                                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f), CircleShape),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         CircularProgressIndicator(
-                                            progress = job.uploadProgressPercent / 100f,
+                                            progress = { job.uploadProgressPercent / 100f },
+                                            color = MaterialTheme.colorScheme.primary,
                                             strokeWidth = 2.5.dp,
-                                            size = 18.dp,
+                                            modifier = Modifier.size(18.dp)
                                         )
                                     }
                                     Spacer(modifier = Modifier.width(10.dp))
@@ -416,13 +473,13 @@ fun MainLayout(
                                             text = "BACKGROUND TRANSCODING & PORTING STATUS",
                                             fontSize = 9.sp,
                                             fontWeight = FontWeight.Bold,
-                                            color = MiuixTheme.colorScheme.primary,
+                                            color = MaterialTheme.colorScheme.primary,
                                             letterSpacing = 0.8.sp
                                         )
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             Text(
                                                 text = "${job.status}: ${job.originalName}",
-                                                color = MiuixTheme.colorScheme.onSurface,
+                                                color = MaterialTheme.colorScheme.onSurface,
                                                 fontSize = 11.sp,
                                                 fontWeight = FontWeight.SemiBold,
                                                 maxLines = 1,
@@ -433,13 +490,13 @@ fun MainLayout(
                                                 Spacer(modifier = Modifier.width(4.dp))
                                                 Box(
                                                     modifier = Modifier
-                                                        .background(MiuixTheme.colorScheme.primaryContainer, RoundedCornerShape(6.dp))
+                                                        .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(6.dp))
                                                         .padding(horizontal = 4.dp, vertical = 1.dp)
                                                 ) {
                                                     Text(
                                                         text = "+${ongoingJobs.size - 1} more",
                                                         fontSize = 8.sp,
-                                                        color = MiuixTheme.colorScheme.primary,
+                                                        color = MaterialTheme.colorScheme.primary,
                                                         fontWeight = FontWeight.Bold
                                                     )
                                                 }
@@ -449,14 +506,14 @@ fun MainLayout(
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Box(
                                         modifier = Modifier
-                                            .background(MiuixTheme.colorScheme.primaryContainer, RoundedCornerShape(8.dp))
+                                            .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(8.dp))
                                             .padding(horizontal = 8.dp, vertical = 4.dp)
                                     ) {
                                         Text(
                                             text = "VIEW HUD",
                                             fontSize = 9.sp,
                                             fontWeight = FontWeight.ExtraBold,
-                                            color = MiuixTheme.colorScheme.primary
+                                            color = MaterialTheme.colorScheme.primary
                                         )
                                     }
                                 }
@@ -467,7 +524,7 @@ fun MainLayout(
             }
         }
 
-        // Bottom overlay sheet with WorkManager tracking and log outputs
+        // Overlay element containing detailed WorkManager tracking and log outputs
         AnimatedVisibility(
             visible = !isWideScreen && activeOverlayJobId != null && activeJob != null,
             enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
@@ -491,5 +548,15 @@ private fun getScreenIcon(screen: Screen): androidx.compose.ui.graphics.vector.I
         Screen.Queue -> Icons.Default.Build
         Screen.Platforms -> Icons.Default.Share
         Screen.Config -> Icons.Default.Settings
+    }
+}
+
+private fun getScreenColor(screen: Screen): Color {
+    return when (screen) {
+        Screen.Monitor -> Color(0xFFE91E63)
+        Screen.Gallery -> Color(0xFF9C27B0)
+        Screen.Queue -> Color(0xFFFF9800)
+        Screen.Platforms -> Color(0xFF2196F3)
+        Screen.Config -> Color(0xFF4CAF50)
     }
 }

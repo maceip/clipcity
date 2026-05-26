@@ -11,7 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,25 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.Canvas
 import com.example.data.VideoJob
-import com.example.ui.theme.RetroCharcoal
-import com.example.ui.theme.RetroCream
 import com.example.ui.viewmodel.CloudClip
 import com.example.ui.viewmodel.VideoViewModel
-import top.yukonga.miuix.kmp.basic.Button
-import top.yukonga.miuix.kmp.basic.ButtonDefaults
-import top.yukonga.miuix.kmp.basic.Card
-import top.yukonga.miuix.kmp.basic.CardDefaults
-import top.yukonga.miuix.kmp.basic.CircularProgressIndicator
-import top.yukonga.miuix.kmp.basic.HorizontalDivider
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.basic.LinearProgressIndicator
-import top.yukonga.miuix.kmp.basic.Slider
-import top.yukonga.miuix.kmp.basic.Surface
-import top.yukonga.miuix.kmp.basic.Switch
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.basic.TextField
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 fun Sparkline(
@@ -55,13 +38,13 @@ fun Sparkline(
         val width = size.width
         val height = size.height
         val path = androidx.compose.ui.graphics.Path()
-
+        
         val maxVal = (points.maxOrNull() ?: 1f).coerceAtLeast(1f)
         val minVal = (points.minOrNull() ?: 0f)
         val range = (maxVal - minVal).coerceAtLeast(0.1f)
-
+        
         val stepX = width / (points.size - 1).coerceAtLeast(1)
-
+        
         points.forEachIndexed { index, value ->
             val x = index * stepX
             val normalizedY = (value - minVal) / range
@@ -72,7 +55,7 @@ fun Sparkline(
                 path.lineTo(x, y)
             }
         }
-
+        
         drawPath(
             path = path,
             color = lineColor,
@@ -98,7 +81,7 @@ fun MonitorScreen(
     var speedHistory by remember { mutableStateOf(List(12) { 420f + it * 2f }) }
     var gpuHistory by remember { mutableStateOf(List(12) { 50f + it * 1.5f }) }
     var pingHistory by remember { mutableStateOf(List(12) { 15f + (it % 3) * 1f }) }
-
+    
     LaunchedEffect(speed, gpuLoad) {
         speedHistory = (speedHistory.drop(1) + speed.toFloat())
         gpuHistory = (gpuHistory.drop(1) + gpuLoad.toFloat())
@@ -141,7 +124,7 @@ fun MonitorScreen(
 
     // Channels tab selection: 0 = ALL, 1 = TIKTOK, 2 = INSTAGRAM, 3 = YOUTUBE
     var selectedChannelTab by remember { mutableStateOf(0) }
-
+    
     // Simulate active audience state (toggle back/forth from zero-likes real mode)
     var simulateAudienceFeed by remember { mutableStateOf(false) }
 
@@ -218,11 +201,11 @@ fun MonitorScreen(
                 ) {
                     activeJob?.let { job ->
                         Card(
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                            shape = RoundedCornerShape(20.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { onJobClick(job) },
-                            cornerRadius = 20.dp,
-                            colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.primaryContainer)
+                                .clickable { onJobClick(job) }
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Row(
@@ -235,7 +218,7 @@ fun MonitorScreen(
                                             text = "ACTIVE CLIP PIPELINE WORKING",
                                             style = MaterialTheme.typography.labelSmall.copy(
                                                 fontWeight = FontWeight.Bold,
-                                                color = MiuixTheme.colorScheme.primary,
+                                                color = MaterialTheme.colorScheme.primary,
                                                 letterSpacing = 1.sp
                                             )
                                         )
@@ -243,18 +226,18 @@ fun MonitorScreen(
                                             text = "Gemini Processing Subsections...",
                                             style = MaterialTheme.typography.titleMedium.copy(
                                                 fontWeight = FontWeight.Bold,
-                                                color = MiuixTheme.colorScheme.onPrimaryContainer
+                                                color = MaterialTheme.colorScheme.onPrimaryContainer
                                             )
                                         )
                                     }
                                     Box(
                                         modifier = Modifier
-                                            .background(MiuixTheme.colorScheme.secondary, RoundedCornerShape(20.dp))
+                                            .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(20.dp))
                                             .padding(horizontal = 8.dp, vertical = 4.dp)
                                     ) {
                                         Text(
                                             text = "LIVE RENDER",
-                                            color = MiuixTheme.colorScheme.onSecondary,
+                                            color = MaterialTheme.colorScheme.onSecondary,
                                             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)
                                         )
                                     }
@@ -278,11 +261,13 @@ fun MonitorScreen(
                                 }
                                 Spacer(modifier = Modifier.height(6.dp))
                                 LinearProgressIndicator(
+                                    progress = { job.uploadProgressPercent / 100f },
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(8.dp)
                                         .clip(RoundedCornerShape(4.dp)),
-                                    progress = job.uploadProgressPercent / 100f,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
                                 )
                             }
                         }
@@ -297,12 +282,12 @@ fun MonitorScreen(
                         text = "CHANNELS GOOGLE ANALYTICS",
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontWeight = FontWeight.Bold,
-                            color = MiuixTheme.colorScheme.secondary,
+                            color = MaterialTheme.colorScheme.secondary,
                             letterSpacing = 1.2.sp
                         )
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-
+                    
                     // Analytics Channel Bar
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -314,7 +299,7 @@ fun MonitorScreen(
                                 modifier = Modifier
                                     .weight(1f)
                                     .background(
-                                        if (isSelected) MiuixTheme.colorScheme.primaryContainer else MiuixTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                                        if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                                         RoundedCornerShape(8.dp)
                                     )
                                     .clickable { selectedChannelTab = index }
@@ -325,7 +310,7 @@ fun MonitorScreen(
                                     text = name,
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = if (isSelected) MiuixTheme.colorScheme.onPrimaryContainer else MiuixTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                    color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                                 )
                             }
                         }
@@ -336,11 +321,11 @@ fun MonitorScreen(
             // Analytics Grid (Show Zero Likes/Views strictly according to request, but elegantly designed)
             item {
                 Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    shape = RoundedCornerShape(16.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.5.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(16.dp)),
-                    cornerRadius = 16.dp,
-                    colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.surface)
+                        .border(1.5.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
                 ) {
                     Column(modifier = Modifier.padding(14.dp)) {
                         Row(
@@ -352,29 +337,29 @@ fun MonitorScreen(
                                 text = "REAL-TIME CREATOR TRAFFIC",
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     fontWeight = FontWeight.Bold,
-                                    color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                                 )
                             )
-
+                            
                             // Visual button to simulate engagement to help play with the layout
                             Button(
                                 onClick = { simulateAudienceFeed = !simulateAudienceFeed },
-                                modifier = Modifier.height(28.dp),
-                                cornerRadius = 8.dp,
+                                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    color = if (simulateAudienceFeed) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.surfaceVariant
+                                    containerColor = if (simulateAudienceFeed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
                                 ),
-                                insideMargin = PaddingValues(horizontal = 10.dp, vertical = 4.dp)
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier.height(28.dp)
                             ) {
                                 Text(
                                     text = if (simulateAudienceFeed) "ACTIVE FEED" else "SHOW REAL ZERO",
                                     fontSize = 8.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = if (simulateAudienceFeed) Color.White else MiuixTheme.colorScheme.onSurfaceVariantSummary
+                                    color = if (simulateAudienceFeed) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
-
+                        
                         Spacer(modifier = Modifier.height(14.dp))
 
                         // Analytics metric matrix rows
@@ -384,13 +369,13 @@ fun MonitorScreen(
                         ) {
                             // Metrics 1: Views
                             Card(
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f)),
                                 modifier = Modifier
                                     .weight(1f)
-                                    .border(1.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.15f), RoundedCornerShape(10.dp)),
-                                colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f))
+                                    .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f), RoundedCornerShape(10.dp))
                             ) {
                                 Column(modifier = Modifier.padding(10.dp)) {
-                                    Text("VIEWS", fontSize = 8.sp, fontWeight = FontWeight.Black, color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                                    Text("VIEWS", fontSize = 8.sp, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                                     Spacer(modifier = Modifier.height(4.dp))
                                     val viewsText = if (simulateAudienceFeed) {
                                         when (selectedChannelTab) {
@@ -403,23 +388,23 @@ fun MonitorScreen(
                                     val viewsTrend = if (simulateAudienceFeed) "+14.2%" else "+0.0%"
                                     Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
                                         Text(viewsText, fontSize = 16.sp, fontWeight = FontWeight.ExtraBold)
-                                        Text(viewsTrend, fontSize = 9.sp, fontWeight = FontWeight.Bold, color = if (simulateAudienceFeed) Color(0xFF00E676) else MiuixTheme.colorScheme.onSurface.copy(alpha = 0.4f))
+                                        Text(viewsTrend, fontSize = 9.sp, fontWeight = FontWeight.Bold, color = if (simulateAudienceFeed) Color(0xFF00E676) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f))
                                     }
                                     Spacer(modifier = Modifier.height(8.dp))
                                     val viewsPoints = if (simulateAudienceFeed) listOf(10f, 25f, 15f, 40f, 35f, 50f, 45f, 62f, 58f, 75f, 72f, 85f) else List(12) { 0f }
-                                    Sparkline(points = viewsPoints, modifier = Modifier.fillMaxWidth().height(16.dp), lineColor = MiuixTheme.colorScheme.primary)
+                                    Sparkline(points = viewsPoints, modifier = Modifier.fillMaxWidth().height(16.dp), lineColor = MaterialTheme.colorScheme.primary)
                                 }
                             }
 
                             // Metrics 2: Engagement / Likes
                             Card(
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f)),
                                 modifier = Modifier
                                     .weight(1f)
-                                    .border(1.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.15f), RoundedCornerShape(10.dp)),
-                                colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f))
+                                    .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f), RoundedCornerShape(10.dp))
                             ) {
                                 Column(modifier = Modifier.padding(10.dp)) {
-                                    Text("LIKES & COMM", fontSize = 8.sp, fontWeight = FontWeight.Black, color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                                    Text("LIKES & COMM", fontSize = 8.sp, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                                     Spacer(modifier = Modifier.height(4.dp))
                                     val likesText = if (simulateAudienceFeed) {
                                         when (selectedChannelTab) {
@@ -432,11 +417,11 @@ fun MonitorScreen(
                                     val likesTrend = if (simulateAudienceFeed) "+8.8%" else "+0.0%"
                                     Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
                                         Text(likesText, fontSize = 16.sp, fontWeight = FontWeight.ExtraBold)
-                                        Text(likesTrend, fontSize = 9.sp, fontWeight = FontWeight.Bold, color = if (simulateAudienceFeed) Color(0xFF00E676) else MiuixTheme.colorScheme.onSurface.copy(alpha = 0.4f))
+                                        Text(likesTrend, fontSize = 9.sp, fontWeight = FontWeight.Bold, color = if (simulateAudienceFeed) Color(0xFF00E676) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f))
                                     }
                                     Spacer(modifier = Modifier.height(8.dp))
                                     val likesPoints = if (simulateAudienceFeed) listOf(5f, 12f, 8f, 22f, 18f, 31f, 29f, 44f, 40f, 52f, 48f, 60f) else List(12) { 0f }
-                                    Sparkline(points = likesPoints, modifier = Modifier.fillMaxWidth().height(16.dp), lineColor = MiuixTheme.colorScheme.secondary)
+                                    Sparkline(points = likesPoints, modifier = Modifier.fillMaxWidth().height(16.dp), lineColor = MaterialTheme.colorScheme.secondary)
                                 }
                             }
                         }
@@ -449,13 +434,13 @@ fun MonitorScreen(
                         ) {
                             // Metrics 3: Shares
                             Card(
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f)),
                                 modifier = Modifier
                                     .weight(1f)
-                                    .border(1.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.15f), RoundedCornerShape(10.dp)),
-                                colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f))
+                                    .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f), RoundedCornerShape(10.dp))
                             ) {
                                 Column(modifier = Modifier.padding(10.dp)) {
-                                    Text("REPOST & SHARE", fontSize = 8.sp, fontWeight = FontWeight.Black, color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                                    Text("REPOST & SHARE", fontSize = 8.sp, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                                     Spacer(modifier = Modifier.height(4.dp))
                                     val sharesText = if (simulateAudienceFeed) {
                                         when (selectedChannelTab) {
@@ -467,32 +452,32 @@ fun MonitorScreen(
                                     } else "0"
                                     Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
                                         Text(sharesText, fontSize = 16.sp, fontWeight = FontWeight.ExtraBold)
-                                        Text(if (simulateAudienceFeed) "+24.1%" else "+0.0%", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = if (simulateAudienceFeed) Color(0xFF00E676) else MiuixTheme.colorScheme.onSurface.copy(alpha = 0.4f))
+                                        Text(if (simulateAudienceFeed) "+24.1%" else "+0.0%", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = if (simulateAudienceFeed) Color(0xFF00E676) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f))
                                     }
                                     Spacer(modifier = Modifier.height(8.dp))
                                     val sharesPoints = if (simulateAudienceFeed) listOf(2f, 4f, 3f, 9f, 6f, 12f, 10f, 18f, 15f, 22f, 19f, 28f) else List(12) { 0f }
-                                    Sparkline(points = sharesPoints, modifier = Modifier.fillMaxWidth().height(16.dp), lineColor = MiuixTheme.colorScheme.onTertiaryContainer)
+                                    Sparkline(points = sharesPoints, modifier = Modifier.fillMaxWidth().height(16.dp), lineColor = MaterialTheme.colorScheme.tertiary)
                                 }
                             }
 
                             // Metrics 4: Retention/Attention
                             Card(
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f)),
                                 modifier = Modifier
                                     .weight(1f)
-                                    .border(1.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.15f), RoundedCornerShape(10.dp)),
-                                colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f))
+                                    .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f), RoundedCornerShape(10.dp))
                             ) {
                                 Column(modifier = Modifier.padding(10.dp)) {
-                                    Text("RETENTION RT", fontSize = 8.sp, fontWeight = FontWeight.Black, color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                                    Text("RETENTION RT", fontSize = 8.sp, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                                     Spacer(modifier = Modifier.height(4.dp))
                                     val retentionText = if (simulateAudienceFeed) "68.4%" else "0.0%"
                                     Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
                                         Text(retentionText, fontSize = 16.sp, fontWeight = FontWeight.ExtraBold)
-                                        Text(if (simulateAudienceFeed) "+12.0%" else "+0.0%", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = if (simulateAudienceFeed) Color(0xFF00E676) else MiuixTheme.colorScheme.onSurface.copy(alpha = 0.4f))
+                                        Text(if (simulateAudienceFeed) "+12.0%" else "+0.0%", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = if (simulateAudienceFeed) Color(0xFF00E676) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f))
                                     }
                                     Spacer(modifier = Modifier.height(8.dp))
                                     val retentionPoints = if (simulateAudienceFeed) listOf(12f, 14f, 18f, 25f, 28f, 35f, 42f, 48f, 52f, 58f, 64f, 68f) else List(12) { 0f }
-                                    Sparkline(points = retentionPoints, modifier = Modifier.fillMaxWidth().height(16.dp), lineColor = MiuixTheme.colorScheme.primary.copy(alpha = 0.6f))
+                                    Sparkline(points = retentionPoints, modifier = Modifier.fillMaxWidth().height(16.dp), lineColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f))
                                 }
                             }
                         }
@@ -501,9 +486,9 @@ fun MonitorScreen(
                         AnimatedVisibility(visible = !simulateAudienceFeed) {
                             Spacer(modifier = Modifier.height(12.dp))
                             Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                cornerRadius = 8.dp,
-                                colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.primaryContainer.copy(alpha = 0.2f))
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)),
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier.fillMaxWidth()
                             ) {
                                 Row(
                                     modifier = Modifier.padding(10.dp),
@@ -514,7 +499,7 @@ fun MonitorScreen(
                                     Text(
                                         text = "Channel Stream Off: No viewers recorded. Schedule ready content to the peak hour slots below to activate the tracking loop.",
                                         style = MaterialTheme.typography.bodySmall.copy(
-                                            color = MiuixTheme.colorScheme.primary,
+                                            color = MaterialTheme.colorScheme.primary,
                                             fontWeight = FontWeight.Bold
                                         )
                                     )
@@ -528,11 +513,11 @@ fun MonitorScreen(
             // Creator niche segment selector and daily trends board
             item {
                 Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)),
+                    shape = RoundedCornerShape(16.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.25f), RoundedCornerShape(16.dp)),
-                    cornerRadius = 16.dp,
-                    colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f))
+                        .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.25f), RoundedCornerShape(16.dp))
                 ) {
                     Column(modifier = Modifier.padding(14.dp)) {
                         Row(
@@ -544,7 +529,7 @@ fun MonitorScreen(
                                 text = "💡 CREATOR TRENDS INTELLIGENCE",
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     fontWeight = FontWeight.ExtraBold,
-                                    color = MiuixTheme.colorScheme.primary,
+                                    color = MaterialTheme.colorScheme.primary,
                                     letterSpacing = 1.1.sp
                                 )
                             )
@@ -561,16 +546,16 @@ fun MonitorScreen(
                                 )
                             }
                         }
-
+                        
                         Spacer(modifier = Modifier.height(6.dp))
-
+                        
                         Text(
                             text = "Gemini automatically analyzes your imported media to detect target niches, hashtags, and sound styles. Zero sifting or configuration needed! Tap any segment below to manually override the Autopilot settings:",
-                            style = MaterialTheme.typography.bodySmall.copy(color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.7f), lineHeight = 16.sp)
+                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f), lineHeight = 16.sp)
                         )
-
+                        
                         Spacer(modifier = Modifier.height(10.dp))
-
+                        
                         // Dynamic Niche Segment Buttons (Beautiful Scrollable LazyRow preventing squishing)
                         val segmentOptions = listOf("Autopilot (AI Detect) 🤖", "Lifestyle & Vlog", "Gym & Fitness", "Tech & Gadgets", "Food & Cooking")
                         androidx.compose.foundation.lazy.LazyRow(
@@ -582,12 +567,12 @@ fun MonitorScreen(
                                 Box(
                                     modifier = Modifier
                                         .background(
-                                            if (isSelected) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.surface.copy(alpha = 0.5f),
+                                            if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
                                             RoundedCornerShape(8.dp)
                                         )
                                         .border(
                                             1.dp,
-                                            if (isSelected) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.outline.copy(alpha = 0.2f),
+                                            if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
                                             RoundedCornerShape(8.dp)
                                         )
                                         .clickable { activeSegmentNiche = opt }
@@ -598,22 +583,22 @@ fun MonitorScreen(
                                         text = opt,
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = if (isSelected) Color.White else MiuixTheme.colorScheme.onSurface,
+                                        color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,
                                         lineHeight = 14.sp,
                                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
                                     )
                                 }
                             }
                         }
-
+                        
                         Spacer(modifier = Modifier.height(12.dp))
-
+                        
                         // Active Niche Insights report container
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(MiuixTheme.colorScheme.surface.copy(alpha = 0.8f), RoundedCornerShape(10.dp))
-                                .border(1.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.15f), RoundedCornerShape(10.dp))
+                                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f), RoundedCornerShape(10.dp))
+                                .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f), RoundedCornerShape(10.dp))
                                 .padding(12.dp)
                         ) {
                             Column {
@@ -624,7 +609,7 @@ fun MonitorScreen(
                                 ) {
                                     Text(
                                         text = "🎯 DEEP ANALYSIS: ${activeSegmentNiche.uppercase()}",
-                                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Black, color = MiuixTheme.colorScheme.secondary)
+                                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.secondary)
                                     )
                                     Text(
                                         text = when (activeSegmentNiche) {
@@ -638,45 +623,45 @@ fun MonitorScreen(
                                         color = Color(0xFF00E676)
                                     )
                                 }
-
+                                
                                 Spacer(modifier = Modifier.height(6.dp))
-
+                                
                                 Text(
                                     text = "Target Audience: $segmentTargetAudience",
                                     fontSize = 11.sp,
-                                    color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                                     fontWeight = FontWeight.Medium
                                 )
-
+                                
                                 Spacer(modifier = Modifier.height(4.dp))
-
+                                
                                 Text(
                                     text = "🔥 Trending Sound: $segmentSoundTrack",
                                     fontSize = 11.sp,
-                                    color = MiuixTheme.colorScheme.onTertiaryContainer,
+                                    color = MaterialTheme.colorScheme.tertiary,
                                     fontWeight = FontWeight.Bold
                                 )
-
+                                
                                 Spacer(modifier = Modifier.height(8.dp))
-                                Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(MiuixTheme.colorScheme.outline.copy(alpha = 0.15f)))
+                                Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)))
                                 Spacer(modifier = Modifier.height(8.dp))
-
+                                
                                 Text(
                                     text = "Smart Gemini Clipper Instruction Filter Prompt Recommended:",
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                                 )
                                 Spacer(modifier = Modifier.height(3.dp))
                                 Text(
                                     text = "\"$segmentApplyPrompt\"",
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Medium,
-                                    style = MaterialTheme.typography.bodyMedium.copy(color = MiuixTheme.colorScheme.onSurface)
+                                    style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface)
                                 )
-
+                                
                                 Spacer(modifier = Modifier.height(10.dp))
-
+                                
                                 Button(
                                     onClick = {
                                         viewModel.geminiClipperPrompt.value = segmentApplyPrompt
@@ -689,10 +674,10 @@ fun MonitorScreen(
                                         viewModel.selectedCropRatio.value = "Vertical (9:16)"
                                         onNavigateToQueue()
                                     },
+                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                    shape = RoundedCornerShape(8.dp),
                                     modifier = Modifier.fillMaxWidth(),
-                                    cornerRadius = 8.dp,
-                                    colors = ButtonDefaults.buttonColors(color = MiuixTheme.colorScheme.primary),
-                                    insideMargin = PaddingValues(vertical = 10.dp)
+                                    contentPadding = PaddingValues(vertical = 10.dp)
                                 ) {
                                     Icon(
                                         imageVector = Icons.Filled.Send,
@@ -721,14 +706,14 @@ fun MonitorScreen(
                         text = "PEAK DAILY PUBLISHING BOARD",
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontWeight = FontWeight.Bold,
-                            color = MiuixTheme.colorScheme.secondary,
+                            color = MaterialTheme.colorScheme.secondary,
                             letterSpacing = 1.2.sp
                         )
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = "Divide the day into peak response windows mapped to $activeSegmentNiche",
-                        style = MaterialTheme.typography.bodySmall.copy(color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.5f))
+                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
                     )
                 }
             }
@@ -785,14 +770,14 @@ fun MonitorScreen(
                         text = "CREATIVE ZEITGEIST FEED",
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontWeight = FontWeight.Bold,
-                            color = MiuixTheme.colorScheme.secondary,
+                            color = MaterialTheme.colorScheme.secondary,
                             letterSpacing = 1.2.sp
                         )
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = "Trending styles updated three times a day. Tap to apply prompts.",
-                        style = MaterialTheme.typography.bodySmall.copy(color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.5f))
+                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
                     )
                 }
             }
@@ -800,11 +785,11 @@ fun MonitorScreen(
             // News Item 1
             item {
                 Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    shape = RoundedCornerShape(16.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.25f), RoundedCornerShape(16.dp)),
-                    cornerRadius = 16.dp,
-                    colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.surface)
+                        .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.25f), RoundedCornerShape(16.dp))
                 ) {
                     VideoFirstFrameSurface(
                         videoName = "Vlog_morning_style.mp4",
@@ -844,10 +829,10 @@ fun MonitorScreen(
                                     viewModel.selectedCropRatio.value = "Vertical (9:16)"
                                     onNavigateToQueue()
                                 },
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                shape = RoundedCornerShape(8.dp),
                                 modifier = Modifier.align(Alignment.End),
-                                cornerRadius = 8.dp,
-                                colors = ButtonDefaults.buttonColors(color = MiuixTheme.colorScheme.primary),
-                                insideMargin = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
                             ) {
                                 Text("APPLY STYLE SYSTEM", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color.White)
                             }
@@ -859,11 +844,11 @@ fun MonitorScreen(
             // News Item 2
             item {
                 Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    shape = RoundedCornerShape(16.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.25f), RoundedCornerShape(16.dp)),
-                    cornerRadius = 16.dp,
-                    colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.surface)
+                        .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.25f), RoundedCornerShape(16.dp))
                 ) {
                     VideoFirstFrameSurface(
                         videoName = "Gym_Workout_POV.mov",
@@ -903,10 +888,10 @@ fun MonitorScreen(
                                     viewModel.selectedCropRatio.value = "Vertical (9:16)"
                                     onNavigateToQueue()
                                 },
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
+                                shape = RoundedCornerShape(8.dp),
                                 modifier = Modifier.align(Alignment.End),
-                                cornerRadius = 8.dp,
-                                colors = ButtonDefaults.buttonColors(color = MiuixTheme.colorScheme.onTertiaryContainer),
-                                insideMargin = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
                             ) {
                                 Text("APPLY STYLE SYSTEM", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color.White)
                             }
@@ -918,11 +903,11 @@ fun MonitorScreen(
             // News Item 3
             item {
                 Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    shape = RoundedCornerShape(16.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.25f), RoundedCornerShape(16.dp)),
-                    cornerRadius = 16.dp,
-                    colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.surface)
+                        .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.25f), RoundedCornerShape(16.dp))
                 ) {
                     VideoFirstFrameSurface(
                         videoName = "Drone_UltraHD_Tokyo.mp4",
@@ -962,10 +947,10 @@ fun MonitorScreen(
                                     viewModel.selectedCropRatio.value = "Vertical (9:16)"
                                     onNavigateToQueue()
                                 },
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                shape = RoundedCornerShape(8.dp),
                                 modifier = Modifier.align(Alignment.End),
-                                cornerRadius = 8.dp,
-                                colors = ButtonDefaults.buttonColors(color = MiuixTheme.colorScheme.primary),
-                                insideMargin = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
                             ) {
                                 Text("APPLY STYLE SYSTEM", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color.White)
                             }
@@ -985,18 +970,18 @@ fun MonitorScreen(
                 .padding(bottom = 24.dp)
         ) {
             Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.inverseSurface),
+                shape = RoundedCornerShape(12.dp),
                 modifier = Modifier
                     .padding(horizontal = 24.dp)
-                    .border(1.dp, MiuixTheme.colorScheme.outline, RoundedCornerShape(12.dp)),
-                cornerRadius = 12.dp,
-                colors = CardDefaults.defaultColors(color = RetroCharcoal)
+                    .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
             ) {
                 Row(modifier = Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(text = "🚀", fontSize = 18.sp)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = showPublisherToast ?: "",
-                        color = RetroCream,
+                        color = MaterialTheme.colorScheme.inverseOnSurface,
                         style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold)
                     )
                 }
@@ -1006,7 +991,7 @@ fun MonitorScreen(
         // Custom assignment sheet / select dialog (Inline pop-up overlay modal)
         if (activeAssigningSlot != null) {
             val uncompletedList = jobs.filter { it.status == "Posted" }
-
+            
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -1015,13 +1000,13 @@ fun MonitorScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    shape = RoundedCornerShape(20.dp),
                     modifier = Modifier
                         .fillMaxWidth(0.9f)
                         .padding(16.dp)
-                        .border(1.5.dp, MiuixTheme.colorScheme.outline, RoundedCornerShape(20.dp))
-                        .clickable(enabled = false) {},
-                    cornerRadius = 20.dp,
-                    colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.surface)
+                        .border(1.5.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(20.dp))
+                        .clickable(enabled = false) {}
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Row(
@@ -1040,7 +1025,7 @@ fun MonitorScreen(
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
                             text = "Choose from your fully-rendered movie frames to assign this slot.",
-                            style = MaterialTheme.typography.bodySmall.copy(color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                         )
                         Spacer(modifier = Modifier.height(14.dp))
 
@@ -1064,9 +1049,10 @@ fun MonitorScreen(
                             ) {
                                 uncompletedList.forEach { job ->
                                     Card(
+                                        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .border(1.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+                                            .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
                                             .clickable {
                                                 when (activeAssigningSlot) {
                                                     "morning" -> morningJobId = job.id
@@ -1074,8 +1060,7 @@ fun MonitorScreen(
                                                     "night" -> nightJobId = job.id
                                                 }
                                                 activeAssigningSlot = null
-                                            },
-                                        colors = CardDefaults.defaultColors(color = Color.Transparent)
+                                            }
                                     ) {
                                         VideoFirstFrameSurface(
                                             videoName = job.originalName,
@@ -1115,11 +1100,11 @@ fun SlotCard(
     onPublishClick: () -> Unit
 ) {
     Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.5.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(16.dp)),
-        cornerRadius = 16.dp,
-        colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.surface)
+            .border(1.5.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
             // Slot metadata header
@@ -1134,26 +1119,26 @@ fun SlotCard(
                             text = slotName,
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Black,
-                                color = MiuixTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.primary
                             )
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Box(
                             modifier = Modifier
-                                .background(MiuixTheme.colorScheme.primaryContainer.copy(alpha = 0.6f), RoundedCornerShape(4.dp))
+                                .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f), RoundedCornerShape(4.dp))
                                 .padding(horizontal = 6.dp, vertical = 2.dp)
                         ) {
                             Text(
                                 text = timeRange,
                                 style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                                color = MiuixTheme.colorScheme.onPrimaryContainer
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                         }
                     }
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = "Suggested Content: $recommendedTrend",
-                        style = MaterialTheme.typography.bodySmall.copy(color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                     )
                 }
             }
@@ -1167,7 +1152,7 @@ fun SlotCard(
                         .fillMaxWidth()
                         .height(110.dp)
                         .clip(RoundedCornerShape(10.dp))
-                        .border(1.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.15f), RoundedCornerShape(10.dp))
+                        .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f), RoundedCornerShape(10.dp))
                         .clickable { onAssignClick() }
                 ) {
                     Box(
@@ -1213,22 +1198,22 @@ fun SlotCard(
                                 )
                             }
                         }
-
+                        
                         // Action buttons
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             Button(
                                 onClick = onAssignClick,
-                                cornerRadius = 8.dp,
-                                colors = ButtonDefaults.buttonColors(color = Color.White.copy(alpha = 0.15f)),
-                                insideMargin = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.White.copy(alpha = 0.15f)),
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                                shape = RoundedCornerShape(8.dp)
                             ) {
                                 Text("CHANGE", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color.White)
                             }
                             Button(
                                 onClick = onPublishClick,
-                                cornerRadius = 8.dp,
-                                colors = ButtonDefaults.buttonColors(color = MiuixTheme.colorScheme.primary),
-                                insideMargin = PaddingValues(horizontal = 10.dp, vertical = 4.dp)
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+                                shape = RoundedCornerShape(8.dp)
                             ) {
                                 Text("PUBLISH", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color.White)
                             }
@@ -1243,7 +1228,7 @@ fun SlotCard(
                         .fillMaxWidth()
                         .height(80.dp)
                         .clip(RoundedCornerShape(10.dp))
-                        .border(1.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.15f), RoundedCornerShape(10.dp))
+                        .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f), RoundedCornerShape(10.dp))
                         .clickable { onAssignClick() }
                 ) {
                     Box(
@@ -1260,7 +1245,7 @@ fun SlotCard(
                             text = "+ ASSIGN READY CLIP TO PUBLISH",
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontWeight = FontWeight.ExtraBold,
-                                color = MiuixTheme.colorScheme.secondaryContainer
+                                color = MaterialTheme.colorScheme.secondaryContainer
                             )
                         )
                         Spacer(modifier = Modifier.height(2.dp))
@@ -1313,18 +1298,18 @@ fun QueueScreen(
             // Source Config Box
             item {
                 Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    shape = RoundedCornerShape(20.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(20.dp)),
-                    cornerRadius = 20.dp,
-                    colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.surface)
+                        .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(20.dp))
                 ) {
                     Column(modifier = Modifier.padding(14.dp)) {
                         Text(
                             text = "IMPORT SOURCE",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = MiuixTheme.colorScheme.primary,
+                                color = MaterialTheme.colorScheme.primary,
                                 letterSpacing = 1.sp
                             )
                         )
@@ -1343,18 +1328,18 @@ fun QueueScreen(
                             listOf("Google Drive", "AWS S3", "Snapchat", "Dropbox").forEach { provider ->
                                 val isSelected = provider == cloudSource
                                 val authStatus = authStatusMap[provider] ?: "Disconnected"
-
+                                
                                 Box(
                                     modifier = Modifier
                                         .weight(1f)
                                         .clip(RoundedCornerShape(10.dp))
                                         .background(
                                             if (authStatus == "Connecting") {
-                                                MiuixTheme.colorScheme.primary.copy(alpha = 0.4f)
+                                                MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
                                             } else if (isSelected) {
-                                                MiuixTheme.colorScheme.primary
+                                                MaterialTheme.colorScheme.primary
                                             } else {
-                                                MiuixTheme.colorScheme.primaryContainer.copy(alpha = 0.15f)
+                                                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.15f)
                                             }
                                         )
                                         .clickable {
@@ -1378,8 +1363,9 @@ fun QueueScreen(
                                         if (authStatus == "Connecting") {
                                             Spacer(modifier = Modifier.height(2.dp))
                                             CircularProgressIndicator(
+                                                modifier = Modifier.size(10.dp),
                                                 strokeWidth = 1.5.dp,
-                                                size = 10.dp
+                                                color = Color.White
                                             )
                                         } else {
                                             Spacer(modifier = Modifier.height(2.dp))
@@ -1387,7 +1373,7 @@ fun QueueScreen(
                                                 text = if (authStatus == "Connected") "OAuth OK" else "Tap Auth",
                                                 fontSize = 8.sp,
                                                 fontWeight = FontWeight.Bold,
-                                                color = if (isSelected) Color(0xFF07060C).copy(alpha = 0.8f) else MiuixTheme.colorScheme.primary
+                                                color = if (isSelected) Color(0xFF07060C).copy(alpha = 0.8f) else MaterialTheme.colorScheme.primary
                                             )
                                         }
                                     }
@@ -1401,18 +1387,18 @@ fun QueueScreen(
             // Target settings options
             item {
                 Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    shape = RoundedCornerShape(20.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(20.dp)),
-                    cornerRadius = 20.dp,
-                    colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.surface)
+                        .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(20.dp))
                 ) {
                     Column(modifier = Modifier.padding(14.dp)) {
                         Text(
                             text = "DELIVERY CONFIGURATION",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = MiuixTheme.colorScheme.primary,
+                                color = MaterialTheme.colorScheme.primary,
                                 letterSpacing = 1.sp
                             )
                         )
@@ -1429,11 +1415,11 @@ fun QueueScreen(
                                         .weight(1f)
                                         .border(
                                             width = 1.dp,
-                                            color = if (isSelected) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.outline.copy(alpha = 0.3f),
+                                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
                                             shape = RoundedCornerShape(8.dp)
                                         )
                                         .background(
-                                            if (isSelected) MiuixTheme.colorScheme.primary.copy(alpha = 0.12f) else Color.Transparent,
+                                            if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f) else Color.Transparent,
                                             RoundedCornerShape(8.dp)
                                         )
                                         .clickable {
@@ -1450,13 +1436,13 @@ fun QueueScreen(
                                 ) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         if (isSelected) {
-                                            Text(text = "✓ ", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = MiuixTheme.colorScheme.primary)
+                                            Text(text = "✓ ", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                                         }
                                         Text(
                                             text = item,
                                             fontSize = 11.sp,
                                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
-                                            color = if (isSelected) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.onSurface
+                                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                                         )
                                     }
                                 }
@@ -1469,11 +1455,11 @@ fun QueueScreen(
             // Media Import Terminal
             item {
                 Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    shape = RoundedCornerShape(20.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.5.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.4f), RoundedCornerShape(20.dp)),
-                    cornerRadius = 20.dp,
-                    colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.surface)
+                        .border(1.5.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.4f), RoundedCornerShape(20.dp))
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
@@ -1483,28 +1469,28 @@ fun QueueScreen(
                             text = "INTEGRATED MEDIA SOURCE IMPORT",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = MiuixTheme.colorScheme.primary,
+                                color = MaterialTheme.colorScheme.primary,
                                 letterSpacing = 1.2.sp
                             )
                         )
                         Text(
                             text = "Select a source to ingest full-fidelity multimedia streams directly into the active render terminal pipeline.",
-                            style = MaterialTheme.typography.bodySmall.copy(color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
                         )
-
+                        
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Button(
-                                onClick = {
+                                onClick = { 
                                     importFileName = "User_Local_Clip_${System.currentTimeMillis().toString().takeLast(3)}.mp4"
-                                    showImportDialogType = "local"
+                                    showImportDialogType = "local" 
                                 },
                                 modifier = Modifier.weight(1f),
-                                cornerRadius = 10.dp,
-                                colors = ButtonDefaults.buttonColors(color = MiuixTheme.colorScheme.secondary),
-                                insideMargin = PaddingValues(vertical = 8.dp)
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                                contentPadding = PaddingValues(vertical = 8.dp),
+                                shape = RoundedCornerShape(10.dp)
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(imageVector = Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
@@ -1512,13 +1498,13 @@ fun QueueScreen(
                                     Text("LOCAL FILE", fontSize = 10.sp, fontWeight = FontWeight.Black)
                                 }
                             }
-
+                            
                             Button(
                                 onClick = { showImportDialogType = "photos" },
                                 modifier = Modifier.weight(1f),
-                                cornerRadius = 10.dp,
-                                colors = ButtonDefaults.buttonColors(color = MiuixTheme.colorScheme.onTertiaryContainer),
-                                insideMargin = PaddingValues(vertical = 8.dp)
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
+                                contentPadding = PaddingValues(vertical = 8.dp),
+                                shape = RoundedCornerShape(10.dp)
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(imageVector = Icons.Default.Face, contentDescription = null, modifier = Modifier.size(16.dp))
@@ -1526,13 +1512,13 @@ fun QueueScreen(
                                     Text("PHOTOS", fontSize = 10.sp, fontWeight = FontWeight.Black)
                                 }
                             }
-
+                            
                             Button(
                                 onClick = { showImportDialogType = "gdrive" },
                                 modifier = Modifier.weight(1f),
-                                cornerRadius = 10.dp,
-                                colors = ButtonDefaults.buttonColors(color = MiuixTheme.colorScheme.primary),
-                                insideMargin = PaddingValues(vertical = 8.dp)
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                contentPadding = PaddingValues(vertical = 8.dp),
+                                shape = RoundedCornerShape(10.dp)
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(imageVector = Icons.Default.Share, contentDescription = null, modifier = Modifier.size(16.dp))
@@ -1558,7 +1544,7 @@ fun QueueScreen(
                     )
                     Text(
                         text = "${cloudPoolClips.size} items available",
-                        style = MaterialTheme.typography.bodySmall.copy(color = MiuixTheme.colorScheme.primary)
+                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.primary)
                     )
                 }
             }
@@ -1566,11 +1552,11 @@ fun QueueScreen(
             // Available Pool Items
             items(cloudPoolClips) { clip ->
                 Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    shape = RoundedCornerShape(16.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.15f), RoundedCornerShape(16.dp)),
-                    cornerRadius = 16.dp,
-                    colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.surface)
+                        .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
                 ) {
                     VideoFirstFrameSurface(
                         videoName = clip.name,
@@ -1625,9 +1611,9 @@ fun QueueScreen(
                                     val targets = selectedPlatforms.joinToString(" & ")
                                     showToastMessage = "Porting process initiated seamlessly for $targets channel(s)."
                                 },
-                                cornerRadius = 10.dp,
-                                colors = ButtonDefaults.buttonColors(color = MiuixTheme.colorScheme.primary),
-                                insideMargin = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                shape = RoundedCornerShape(10.dp),
+                                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
                             ) {
                                 Text(text = "AUTO PORT", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
                             }
@@ -1648,12 +1634,13 @@ fun QueueScreen(
         ) {
             showToastMessage?.let { msg ->
                 Surface(
+                    color = Color(0xEB0F0E17), // Deep elegant dark obsidian tint mirroring design aesthetics
+                    shape = RoundedCornerShape(14.dp),
+                    tonalElevation = 6.dp,
+                    shadowElevation = 8.dp,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, Color(0xFFD0BCFF).copy(alpha = 0.35f), RoundedCornerShape(14.dp)),
-                    shape = RoundedCornerShape(14.dp),
-                    color = Color(0xEB0F0E17), // Deep elegant dark obsidian tint mirroring design aesthetics
-                    shadowElevation = 8.dp
+                        .border(1.dp, Color(0xFFD0BCFF).copy(alpha = 0.35f), RoundedCornerShape(14.dp))
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
@@ -1662,7 +1649,7 @@ fun QueueScreen(
                         Box(
                             modifier = Modifier
                                 .size(24.dp)
-                                .background(MiuixTheme.colorScheme.primary.copy(alpha = 0.2f), CircleShape),
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(text = "✓", color = Color(0xFFD0BCFF), fontSize = 12.sp, fontWeight = FontWeight.Black)
@@ -1689,12 +1676,12 @@ fun QueueScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    shape = RoundedCornerShape(24.dp),
                     modifier = Modifier
                         .fillMaxWidth(0.9f)
-                        .border(1.5.dp, MiuixTheme.colorScheme.outline, RoundedCornerShape(24.dp))
-                        .clickable(enabled = false) {},
-                    cornerRadius = 24.dp,
-                    colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.surface)
+                        .border(1.5.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(24.dp))
+                        .clickable(enabled = false) {}
                 ) {
                     Column(
                         modifier = Modifier
@@ -1723,34 +1710,34 @@ fun QueueScreen(
                         if (showImportDialogType == "local") {
                             Text(
                                 text = "Enter filename and size parameters. In a production environment, this triggers a native Android file chooser.",
-                                style = MaterialTheme.typography.bodySmall.copy(color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                                style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
                             )
-
-                            TextField(
+                            
+                            OutlinedTextField(
                                 value = importFileName,
                                 onValueChange = { importFileName = it },
+                                label = { Text("File Name (e.g., Cooking_Vlog.mp4)") },
                                 modifier = Modifier.fillMaxWidth(),
-                                label = "File Name (e.g., Cooking_Vlog.mp4)",
-                                useLabelAsPlaceholder = true
+                                singleLine = true
                             )
-
+                            
                             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                                TextField(
+                                OutlinedTextField(
                                     value = importFileSize,
                                     onValueChange = { importFileSize = it },
+                                    label = { Text("Size (MB)") },
                                     modifier = Modifier.weight(1f),
-                                    label = "Size (MB)",
-                                    useLabelAsPlaceholder = true
+                                    singleLine = true
                                 )
-                                TextField(
+                                OutlinedTextField(
                                     value = importFileDuration,
                                     onValueChange = { importFileDuration = it },
+                                    label = { Text("Duration (sec)") },
                                     modifier = Modifier.weight(1f),
-                                    label = "Duration (sec)",
-                                    useLabelAsPlaceholder = true
+                                    singleLine = true
                                 )
                             }
-
+                            
                             Button(
                                 onClick = {
                                     val size = importFileSize.toDoubleOrNull() ?: 75.0
@@ -1761,24 +1748,25 @@ fun QueueScreen(
                                     showImportDialogType = null
                                 },
                                 modifier = Modifier.fillMaxWidth(),
-                                cornerRadius = 12.dp
+                                shape = RoundedCornerShape(12.dp)
                             ) {
                                 Text("INGEST LOCAL RUNTIME STREAM")
                             }
                         } else if (showImportDialogType == "photos") {
                             Text(
                                 text = "Pick from device Photo Album or Camera roll streams:",
-                                style = MaterialTheme.typography.bodySmall.copy(color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                                style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
                             )
-
+                            
                             val photoOptions = listOf(
                                 Triple("Tokyo_Street_Food_Vibe.mp4", 95.0, 30),
                                 Triple("Skiing_Hyperlapse_POV.mp4", 180.0, 60),
                                 Triple("Gym_Workout_Motivation.mp4", 65.0, 15)
                             )
-
+                            
                             photoOptions.forEach { opt ->
                                 Card(
+                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable {
@@ -1786,9 +1774,8 @@ fun QueueScreen(
                                             showToastMessage = "Ingested photos video: ${opt.first}"
                                             showImportDialogType = null
                                         }
-                                        .border(0.5.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(12.dp)),
-                                    cornerRadius = 12.dp,
-                                    colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.background)
+                                        .border(0.5.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(12.dp)),
+                                    shape = RoundedCornerShape(12.dp)
                                 ) {
                                     Row(
                                         modifier = Modifier.padding(12.dp),
@@ -1798,7 +1785,7 @@ fun QueueScreen(
                                         Spacer(modifier = Modifier.width(10.dp))
                                         Column {
                                             Text(opt.first, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                                            Text("${opt.second} MB • ${opt.third}s", fontSize = 11.sp, color = MiuixTheme.colorScheme.primary)
+                                            Text("${opt.second} MB • ${opt.third}s", fontSize = 11.sp, color = MaterialTheme.colorScheme.primary)
                                         }
                                     }
                                 }
@@ -1806,17 +1793,18 @@ fun QueueScreen(
                         } else if (showImportDialogType == "gdrive") {
                             Text(
                                 text = "Browse and sync from configured cloud Google Drive compartments:",
-                                style = MaterialTheme.typography.bodySmall.copy(color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                                style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
                             )
-
+                            
                             val driveOptions = listOf(
                                 Triple("Google_Tech_Panel_Summary.mp4", 450.0, 240),
                                 Triple("Ad_Campaign_Short_Vertical.mp4", 30.0, 10),
                                 Triple("Coffee_Roastery_B_Roll.mov", 125.0, 35)
                             )
-
+                            
                             driveOptions.forEach { opt ->
                                 Card(
+                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable {
@@ -1824,9 +1812,8 @@ fun QueueScreen(
                                             showToastMessage = "Synced from G-Drive: ${opt.first}"
                                             showImportDialogType = null
                                         }
-                                        .border(0.5.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(12.dp)),
-                                    cornerRadius = 12.dp,
-                                    colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.background)
+                                        .border(0.5.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(12.dp)),
+                                    shape = RoundedCornerShape(12.dp)
                                 ) {
                                     Row(
                                         modifier = Modifier.padding(12.dp),
@@ -1836,7 +1823,7 @@ fun QueueScreen(
                                         Spacer(modifier = Modifier.width(10.dp))
                                         Column {
                                             Text(opt.first, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                                            Text("${opt.second} MB • ${opt.third}s", fontSize = 11.sp, color = MiuixTheme.colorScheme.primary)
+                                            Text("${opt.second} MB • ${opt.third}s", fontSize = 11.sp, color = MaterialTheme.colorScheme.primary)
                                         }
                                     }
                                 }
@@ -1872,16 +1859,16 @@ fun PlatformsScreen(
     ) {
         item {
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                cornerRadius = 24.dp,
-                colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.primaryContainer)
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                shape = RoundedCornerShape(24.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = "SOCIAL BROADCAST MANAGER",
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontWeight = FontWeight.Bold,
-                            color = MiuixTheme.colorScheme.secondary,
+                            color = MaterialTheme.colorScheme.secondary,
                             letterSpacing = 1.sp
                         )
                     )
@@ -1893,7 +1880,7 @@ fun PlatformsScreen(
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
                         text = "All completed WorkManager loops are automatically transcoded to high-efficiency HEVC formatting, meta-tagged, and dispatched via secure OAuth client pathways.",
-                        style = MaterialTheme.typography.bodySmall.copy(color = MiuixTheme.colorScheme.secondary.copy(alpha = 0.8f))
+                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f))
                     )
                 }
             }
@@ -1901,11 +1888,11 @@ fun PlatformsScreen(
 
         items(connectedAccounts) { account ->
             Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                shape = RoundedCornerShape(20.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(1.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(20.dp)),
-                cornerRadius = 20.dp,
-                colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.surface)
+                    .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(20.dp))
             ) {
                 Column(modifier = Modifier.padding(14.dp)) {
                     Row(
@@ -1931,7 +1918,7 @@ fun PlatformsScreen(
                                 )
                                 Text(
                                     text = account.handle,
-                                    style = MaterialTheme.typography.bodySmall.copy(color = MiuixTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                                 )
                             }
                         }
@@ -1945,7 +1932,7 @@ fun PlatformsScreen(
                     }
 
                     Spacer(modifier = Modifier.height(10.dp))
-                    HorizontalDivider(color = MiuixTheme.colorScheme.outline.copy(alpha = 0.15f))
+                    Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f))
                     Spacer(modifier = Modifier.height(10.dp))
 
                     Row(
@@ -1953,11 +1940,11 @@ fun PlatformsScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column {
-                            Text(text = "AUDIENCE SIZE", style = MaterialTheme.typography.labelSmall.copy(color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.5f)))
+                            Text(text = "AUDIENCE SIZE", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)))
                             Text(text = account.metrics, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
                         }
                         Column(horizontalAlignment = Alignment.End) {
-                            Text(text = "BATON LOOPS", style = MaterialTheme.typography.labelSmall.copy(color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.5f)))
+                            Text(text = "BATON LOOPS", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)))
                             Text(text = account.totalPosted, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
                         }
                     }
@@ -1974,7 +1961,7 @@ fun ConfigScreen(
 ) {
     val jobs by viewModel.allJobs.collectAsState()
     val hardwareAccel by viewModel.hardwareAccelEnabled.collectAsState()
-
+    
     val cropRatio by viewModel.selectedCropRatio.collectAsState()
     val filter by viewModel.selectedFilter.collectAsState()
     val compression by viewModel.selectedCompression.collectAsState()
@@ -1999,18 +1986,18 @@ fun ConfigScreen(
             // Toggle items for latest Android version features
             item {
                 Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    shape = RoundedCornerShape(20.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(20.dp)),
-                    cornerRadius = 20.dp,
-                    colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.surface)
+                        .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(20.dp))
                 ) {
                     Column(modifier = Modifier.padding(14.dp)) {
                         Text(
                             text = "HARDWARE TRANSCODING ENGINE RULES",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = MiuixTheme.colorScheme.primary,
+                                color = MaterialTheme.colorScheme.primary,
                                 letterSpacing = 1.sp
                             )
                         )
@@ -2025,7 +2012,7 @@ fun ConfigScreen(
                                 Text(text = "Direct GPU Hardware Acceleration", style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
                                 Text(
                                     text = "Bypasses slow CPU pipelines for automatic hardware-integrated HEVC transcoding.",
-                                    style = MaterialTheme.typography.bodySmall.copy(color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                                 )
                             }
                             Switch(
@@ -2035,7 +2022,7 @@ fun ConfigScreen(
                         }
 
                         Spacer(modifier = Modifier.height(12.dp))
-                        HorizontalDivider(color = MiuixTheme.colorScheme.outline.copy(alpha = 0.15f))
+                        Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f))
                         Spacer(modifier = Modifier.height(12.dp))
 
                         Row(
@@ -2047,14 +2034,14 @@ fun ConfigScreen(
                                 Text(text = "Strict Energy Bypass Integration", style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
                                 Text(
                                     text = "Uses Android WorkManager expedited jobs to override strict background battery throttling.",
-                                    style = MaterialTheme.typography.bodySmall.copy(color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                                 )
                             }
                             Switch(checked = true, onCheckedChange = {})
                         }
 
                         Spacer(modifier = Modifier.height(12.dp))
-                        HorizontalDivider(color = MiuixTheme.colorScheme.outline.copy(alpha = 0.15f))
+                        Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f))
                         Spacer(modifier = Modifier.height(12.dp))
 
                         Row(
@@ -2066,7 +2053,7 @@ fun ConfigScreen(
                                 Text(text = "Adaptive Pixel Fold layout canvas", style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
                                 Text(
                                     text = "Dynamic side navigation rail swaps when folding and unfolding devices.",
-                                    style = MaterialTheme.typography.bodySmall.copy(color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                                 )
                             }
                             Switch(checked = true, onCheckedChange = {}, enabled = false)
@@ -2078,25 +2065,25 @@ fun ConfigScreen(
             // Expose the parameters we migrated from the Queue view
             item {
                 Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    shape = RoundedCornerShape(20.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(20.dp)),
-                    cornerRadius = 20.dp,
-                    colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.surface)
+                        .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(20.dp))
                 ) {
                     Column(modifier = Modifier.padding(14.dp)) {
                         Text(
                             text = "DEFAULT TRANSCODING PROFILE CONFIGURATION",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = MiuixTheme.colorScheme.primary,
+                                color = MaterialTheme.colorScheme.primary,
                                 letterSpacing = 1.sp
                             )
                         )
                         Spacer(modifier = Modifier.height(14.dp))
 
                         // Param 1: Smart Crop Mode
-                        Text(text = "Smart Reframing Canvas Aspect", style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold, color = MiuixTheme.colorScheme.onSurface))
+                        Text(text = "Smart Reframing Canvas Aspect", style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface))
                         Spacer(modifier = Modifier.height(6.dp))
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
                             listOf("Vertical (9:16)", "Landscape (16:9)", "Square (1:1)").forEach { item ->
@@ -2106,11 +2093,11 @@ fun ConfigScreen(
                                         .weight(1f)
                                         .border(
                                             width = 1.dp,
-                                            color = if (isSelected) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.outline.copy(alpha = 0.3f),
+                                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
                                             shape = RoundedCornerShape(8.dp)
                                         )
                                         .background(
-                                            if (isSelected) MiuixTheme.colorScheme.primary.copy(alpha = 0.12f) else Color.Transparent,
+                                            if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f) else Color.Transparent,
                                             RoundedCornerShape(8.dp)
                                         )
                                         .clickable { viewModel.selectedCropRatio.value = item }
@@ -2121,7 +2108,7 @@ fun ConfigScreen(
                                         text = item,
                                         fontSize = 11.sp,
                                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
-                                        color = if (isSelected) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.onSurface
+                                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                                     )
                                 }
                             }
@@ -2130,7 +2117,7 @@ fun ConfigScreen(
                         Spacer(modifier = Modifier.height(14.dp))
 
                         // Param 2: Video Compression settings
-                        Text(text = "Compression Tech Spec (Codecs)", style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold, color = MiuixTheme.colorScheme.onSurface))
+                        Text(text = "Compression Tech Spec (Codecs)", style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface))
                         Spacer(modifier = Modifier.height(6.dp))
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
                             listOf("H.265 (HEVC)", "AV1", "H.264 (AVC)").forEach { item ->
@@ -2140,11 +2127,11 @@ fun ConfigScreen(
                                         .weight(1f)
                                         .border(
                                             width = 1.dp,
-                                            color = if (isSelected) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.outline.copy(alpha = 0.3f),
+                                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
                                             shape = RoundedCornerShape(8.dp)
                                         )
                                         .background(
-                                            if (isSelected) MiuixTheme.colorScheme.primary.copy(alpha = 0.12f) else Color.Transparent,
+                                            if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f) else Color.Transparent,
                                             RoundedCornerShape(8.dp)
                                         )
                                         .clickable { viewModel.selectedCompression.value = item }
@@ -2155,7 +2142,7 @@ fun ConfigScreen(
                                         text = item,
                                         fontSize = 11.sp,
                                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
-                                        color = if (isSelected) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.onSurface
+                                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                                     )
                                 }
                             }
@@ -2164,7 +2151,7 @@ fun ConfigScreen(
                         Spacer(modifier = Modifier.height(14.dp))
 
                         // Param 3: Renderer LUT Filters
-                        Text(text = "GPU Acceleration Filter Style", style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold, color = MiuixTheme.colorScheme.onSurface))
+                        Text(text = "GPU Acceleration Filter Style", style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface))
                         Spacer(modifier = Modifier.height(6.dp))
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
                             listOf("Cinematic Teal", "Sunset Vibe", "Noir Vibe", "Retro Film").forEach { item ->
@@ -2174,11 +2161,11 @@ fun ConfigScreen(
                                         .weight(1f)
                                         .border(
                                             width = 1.dp,
-                                            color = if (isSelected) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.outline.copy(alpha = 0.3f),
+                                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
                                             shape = RoundedCornerShape(8.dp)
                                         )
                                         .background(
-                                            if (isSelected) MiuixTheme.colorScheme.primary.copy(alpha = 0.12f) else Color.Transparent,
+                                            if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f) else Color.Transparent,
                                             RoundedCornerShape(8.dp)
                                         )
                                         .clickable { viewModel.selectedFilter.value = item }
@@ -2189,7 +2176,7 @@ fun ConfigScreen(
                                         text = item,
                                         fontSize = 11.sp,
                                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
-                                        color = if (isSelected) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.onSurface
+                                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                                     )
                                 }
                             }
@@ -2201,18 +2188,18 @@ fun ConfigScreen(
             // Action database cleanups
             item {
                 Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    shape = RoundedCornerShape(20.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(20.dp)),
-                    cornerRadius = 20.dp,
-                    colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.surface)
+                        .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(20.dp))
                 ) {
                     Column(modifier = Modifier.padding(14.dp)) {
                         Text(
                             text = "MAINTENANCE & TEST ACTIONS",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = MiuixTheme.colorScheme.primary,
+                                color = MaterialTheme.colorScheme.primary,
                                 letterSpacing = 1.sp
                             )
                         )
@@ -2223,9 +2210,9 @@ fun ConfigScreen(
                                 viewModel.clearAllHistory()
                                 showResetToastMessage = true
                             },
-                            modifier = Modifier.fillMaxWidth(),
-                            cornerRadius = 12.dp,
-                            colors = ButtonDefaults.buttonColors(color = MiuixTheme.colorScheme.error)
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.fillMaxWidth()
                         ) {
                             Icon(imageVector = Icons.Default.Delete, contentDescription = null)
                             Spacer(modifier = Modifier.width(8.dp))
@@ -2236,7 +2223,7 @@ fun ConfigScreen(
 
                         Text(
                             text = "Debug Info: ${jobs.size} jobs registered in local SQLite Room instance. Enqueued jobs process sequentially. Adaptive Fold layout checks WindowSize runtime specifications.",
-                            style = MaterialTheme.typography.bodySmall.copy(color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.5f))
+                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
                         )
                     }
                 }
@@ -2253,12 +2240,13 @@ fun ConfigScreen(
                 .padding(bottom = 24.dp, start = 16.dp, end = 16.dp)
         ) {
             Surface(
+                color = Color(0xEB0F0E17),
+                shape = RoundedCornerShape(14.dp),
+                tonalElevation = 6.dp,
+                shadowElevation = 8.dp,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(1.dp, Color(0xFFD0BCFF).copy(alpha = 0.35f), RoundedCornerShape(14.dp)),
-                shape = RoundedCornerShape(14.dp),
-                color = Color(0xEB0F0E17),
-                shadowElevation = 8.dp
+                    .border(1.dp, Color(0xFFD0BCFF).copy(alpha = 0.35f), RoundedCornerShape(14.dp))
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
@@ -2301,11 +2289,11 @@ fun GalleryScreen(
 ) {
     val jobs by viewModel.allJobs.collectAsState()
     val postedClips = remember(jobs) { jobs.filter { it.status == "Posted" || it.uploadProgressPercent == 100 } }
-
+    
     var selectedClip by remember { mutableStateOf<VideoJob?>(null) }
     var isPlaying by remember { mutableStateOf(false) }
     var playProgress by remember { mutableStateOf(0.4f) }
-
+    
     // Auto-animate visualizer ticks if playing
     var visualizerPulse by remember { mutableStateOf(0f) }
     LaunchedEffect(isPlaying) {
@@ -2328,11 +2316,11 @@ fun GalleryScreen(
         item {
             // Screen title & dynamic metrics
             Card(
+                colors = CardDefaults.cardColors(containerColor = Color(0x1F00E5FF)),
+                shape = RoundedCornerShape(20.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(1.dp, Color(0x3300E5FF), RoundedCornerShape(20.dp)),
-                cornerRadius = 20.dp,
-                colors = CardDefaults.defaultColors(color = Color(0x1F00E5FF))
+                    .border(1.dp, Color(0x3300E5FF), RoundedCornerShape(20.dp))
             ) {
                 Column(modifier = Modifier.padding(14.dp)) {
                     Row(
@@ -2345,7 +2333,7 @@ fun GalleryScreen(
                                     text = "GALLERY COMPARTMENT",
                                     style = MaterialTheme.typography.labelSmall.copy(
                                         fontWeight = FontWeight.Bold,
-                                        color = MiuixTheme.colorScheme.primary,
+                                        color = MaterialTheme.colorScheme.primary,
                                         letterSpacing = 1.sp
                                     )
                                 )
@@ -2353,42 +2341,42 @@ fun GalleryScreen(
                                     text = "Generated Assets & Clips",
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         fontWeight = FontWeight.Bold,
-                                        color = MiuixTheme.colorScheme.onSurface
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
                                 )
                             }
                             Box(
                                 modifier = Modifier
-                                    .background(MiuixTheme.colorScheme.primaryContainer, RoundedCornerShape(8.dp))
-                                    .border(1.dp, MiuixTheme.colorScheme.outline, RoundedCornerShape(8.dp))
+                                    .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(8.dp))
+                                    .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
                                     .padding(horizontal = 8.dp, vertical = 4.dp)
                             ) {
                                 Text(
                                     text = "ONLINE STATE",
-                                    color = MiuixTheme.colorScheme.primary,
+                                    color = MaterialTheme.colorScheme.primary,
                                     fontSize = 9.sp,
                                     fontWeight = FontWeight.Bold
                                 )
                             }
                         }
-
+                        
                         Spacer(modifier = Modifier.height(12.dp))
-
+                        
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Column {
-                                Text(text = "TOTAL CLIPS", fontSize = 10.sp, color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.6f))
-                                Text(text = "${postedClips.size}", fontSize = 16.sp, fontWeight = FontWeight.Black, color = MiuixTheme.colorScheme.onSurface)
+                                Text(text = "TOTAL CLIPS", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                                Text(text = "${postedClips.size}", fontSize = 16.sp, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurface)
                             }
                             Column {
-                                Text(text = "CONVERTED RATIO", fontSize = 10.sp, color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.6f))
-                                Text(text = "100.0%", fontSize = 16.sp, fontWeight = FontWeight.Black, color = MiuixTheme.colorScheme.secondary)
+                                Text(text = "CONVERTED RATIO", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                                Text(text = "100.0%", fontSize = 16.sp, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.secondary)
                             }
                             Column {
-                                Text(text = "BITRATE STATE", fontSize = 10.sp, color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.6f))
-                                Text(text = "OPTIMIZED", fontSize = 16.sp, fontWeight = FontWeight.Black, color = MiuixTheme.colorScheme.onTertiaryContainer)
+                                Text(text = "BITRATE STATE", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                                Text(text = "OPTIMIZED", fontSize = 16.sp, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.tertiary)
                             }
                         }
 
@@ -2396,24 +2384,24 @@ fun GalleryScreen(
 
                         Button(
                             onClick = { viewModel.syncAllPlatformEngagements() },
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                            shape = RoundedCornerShape(10.dp),
                             modifier = Modifier.fillMaxWidth().height(36.dp),
-                            cornerRadius = 10.dp,
-                            colors = ButtonDefaults.buttonColors(color = MiuixTheme.colorScheme.primaryContainer),
-                            insideMargin = PaddingValues(horizontal = 12.dp, vertical = 2.dp)
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 2.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Refresh,
                                 contentDescription = "Sync Metrics",
                                 modifier = Modifier.size(14.dp),
-                                tint = MiuixTheme.colorScheme.onPrimaryContainer
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("RE-SYNC ALL PLATFORM ENGAGEMENT METRICS 📡", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = MiuixTheme.colorScheme.onPrimaryContainer)
+                            Text("RE-SYNC ALL PLATFORM ENGAGEMENT METRICS 📡", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer)
                         }
                     }
                 }
             }
-
+    
             // Active Preview Player Section
             item {
                 AnimatedContent(
@@ -2422,11 +2410,11 @@ fun GalleryScreen(
                 ) { clip ->
                     if (clip != null) {
                         Card(
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                            shape = RoundedCornerShape(12.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .border(2.dp, MiuixTheme.colorScheme.outline, RoundedCornerShape(12.dp)),
-                            cornerRadius = 12.dp,
-                            colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.surface)
+                                .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
                         ) {
                         Column(modifier = Modifier.padding(14.dp)) {
                             // Video playback viewport area
@@ -2436,7 +2424,7 @@ fun GalleryScreen(
                                     .height(160.dp)
                                     .clip(RoundedCornerShape(12.dp))
                                     .background(Color.Black)
-                                    .border(2.dp, MiuixTheme.colorScheme.outline, RoundedCornerShape(12.dp)),
+                                    .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp)),
                                 contentAlignment = Alignment.Center
                             ) {
                                 // Black screen for high-contrast video view
@@ -2445,7 +2433,7 @@ fun GalleryScreen(
                                         .fillMaxSize()
                                         .background(Color.Black)
                                 )
-
+                                
                                 // Play indicator / audio pulses
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     if (isPlaying) {
@@ -2461,7 +2449,7 @@ fun GalleryScreen(
                                                     modifier = Modifier
                                                         .width(4.dp)
                                                         .fillMaxHeight(0.2f + 0.8f * heightMultiplier)
-                                                        .background(MiuixTheme.colorScheme.primary, RoundedCornerShape(2.dp))
+                                                        .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(2.dp))
                                                 )
                                             }
                                         }
@@ -2469,7 +2457,7 @@ fun GalleryScreen(
                                         Text(
                                             text = "PLAYING: ${clip.originalName}",
                                             fontSize = 9.sp,
-                                            color = MiuixTheme.colorScheme.primary,
+                                            color = MaterialTheme.colorScheme.primary,
                                             fontWeight = FontWeight.Bold,
                                             fontFamily = FontFamily.Monospace
                                         )
@@ -2478,10 +2466,10 @@ fun GalleryScreen(
                                             onClick = { isPlaying = true },
                                             modifier = Modifier
                                                 .size(48.dp)
-                                                .background(MiuixTheme.colorScheme.primaryContainer, CircleShape)
-                                                .border(2.dp, MiuixTheme.colorScheme.outline, CircleShape)
+                                                .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
+                                                .border(2.dp, MaterialTheme.colorScheme.outline, CircleShape)
                                         ) {
-                                            Icon(imageVector = Icons.Default.PlayArrow, contentDescription = "Play", tint = MiuixTheme.colorScheme.primary)
+                                            Icon(imageVector = Icons.Default.PlayArrow, contentDescription = "Play", tint = MaterialTheme.colorScheme.primary)
                                         }
                                         Spacer(modifier = Modifier.height(6.dp))
                                         Text(
@@ -2493,9 +2481,9 @@ fun GalleryScreen(
                                     }
                                 }
                             }
-
+                            
                             Spacer(modifier = Modifier.height(10.dp))
-
+                            
                             // Scrub bar on the light card surface
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -2504,22 +2492,27 @@ fun GalleryScreen(
                                 Text(
                                     text = "0:${String.format("%02d", (playProgress * clip.durationSeconds).toInt())}",
                                     fontSize = 11.sp,
-                                    color = MiuixTheme.colorScheme.onSurface,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                     fontFamily = FontFamily.Monospace
                                 )
                                 Slider(
                                     value = playProgress,
                                     onValueChange = { playProgress = it },
-                                    modifier = Modifier.weight(1f)
+                                    modifier = Modifier.weight(1f),
+                                    colors = SliderDefaults.colors(
+                                        activeTrackColor = MaterialTheme.colorScheme.primary,
+                                        inactiveTrackColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                                        thumbColor = MaterialTheme.colorScheme.primary
+                                    )
                                 )
                                 Text(
                                     text = "0:${clip.durationSeconds}",
                                     fontSize = 11.sp,
-                                    color = MiuixTheme.colorScheme.onSurface,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                     fontFamily = FontFamily.Monospace
                                 )
                             }
-
+                            
                             // Media controls
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -2527,20 +2520,20 @@ fun GalleryScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 IconButton(onClick = { playProgress = 0f }) {
-                                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Rewind", tint = MiuixTheme.colorScheme.onSurface)
+                                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Rewind", tint = MaterialTheme.colorScheme.onSurface)
                                 }
                                 Box(
                                     modifier = Modifier
                                         .size(42.dp)
-                                        .background(MiuixTheme.colorScheme.secondaryContainer, CircleShape)
-                                        .border(2.dp, MiuixTheme.colorScheme.outline, CircleShape)
+                                        .background(MaterialTheme.colorScheme.secondaryContainer, CircleShape)
+                                        .border(2.dp, MaterialTheme.colorScheme.outline, CircleShape)
                                         .clickable { isPlaying = !isPlaying },
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        text = if (isPlaying) "⏸" else "▶",
-                                        color = MiuixTheme.colorScheme.secondary,
-                                        fontSize = 14.sp,
+                                        text = if (isPlaying) "⏸" else "▶", 
+                                        color = MaterialTheme.colorScheme.secondary, 
+                                        fontSize = 14.sp, 
                                         fontWeight = FontWeight.Bold
                                     )
                                 }
@@ -2552,12 +2545,12 @@ fun GalleryScreen(
                                             localUri.openUri(clip.postUrl)
                                         }
                                     },
-                                    modifier = Modifier.border(2.dp, MiuixTheme.colorScheme.outline, RoundedCornerShape(10.dp)),
-                                    cornerRadius = 10.dp,
                                     colors = ButtonDefaults.buttonColors(
-                                        color = MiuixTheme.colorScheme.primary,
-                                        contentColor = MiuixTheme.colorScheme.onPrimary
-                                    )
+                                        containerColor = MaterialTheme.colorScheme.primary,
+                                        contentColor = MaterialTheme.colorScheme.onPrimary
+                                    ),
+                                    shape = RoundedCornerShape(10.dp),
+                                    modifier = Modifier.border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(10.dp))
                                 ) {
                                     Text("Watch On ${clip.socialPlatform}", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                                 }
@@ -2569,8 +2562,8 @@ fun GalleryScreen(
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .background(MiuixTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f), RoundedCornerShape(10.dp))
-                                    .border(1.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.15f), RoundedCornerShape(10.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f), RoundedCornerShape(10.dp))
+                                    .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f), RoundedCornerShape(10.dp))
                                     .padding(10.dp)
                             ) {
                                 Column {
@@ -2583,7 +2576,7 @@ fun GalleryScreen(
                                             text = "📊 LIVE ENGAGEMENT METRICS",
                                             fontSize = 9.sp,
                                             fontWeight = FontWeight.Bold,
-                                            color = MiuixTheme.colorScheme.primary,
+                                            color = MaterialTheme.colorScheme.primary,
                                             letterSpacing = 0.8.sp
                                         )
                                         Text(
@@ -2598,7 +2591,7 @@ fun GalleryScreen(
                                                 "Never Synced"
                                             },
                                             fontSize = 9.sp,
-                                            color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                                         )
                                     }
                                     Spacer(modifier = Modifier.height(8.dp))
@@ -2608,17 +2601,17 @@ fun GalleryScreen(
                                     ) {
                                         // Views Tracker
                                         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
-                                            Text("👁 Views", fontSize = 10.sp, color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                                            Text("👁 Views", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                                             Text(
                                                 text = if (clip.viewsCount >= 1000) String.format("%.1fk", clip.viewsCount / 1000.0) else clip.viewsCount.toString(),
                                                 fontSize = 12.sp,
                                                 fontWeight = FontWeight.Black,
-                                                color = MiuixTheme.colorScheme.onSurface
+                                                color = MaterialTheme.colorScheme.onSurface
                                             )
                                         }
                                         // Likes Tracker
                                         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
-                                            Text("❤ Likes", fontSize = 10.sp, color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                                            Text("❤ Likes", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                                             Text(
                                                 text = if (clip.likesCount >= 1000) String.format("%.1fk", clip.likesCount / 1000.0) else clip.likesCount.toString(),
                                                 fontSize = 12.sp,
@@ -2628,7 +2621,7 @@ fun GalleryScreen(
                                         }
                                         // Shares Tracker
                                         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
-                                            Text("↩ Shares", fontSize = 10.sp, color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                                            Text("↩ Shares", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                                             Text(
                                                 text = if (clip.sharesCount >= 1000) String.format("%.1fk", clip.sharesCount / 1000.0) else clip.sharesCount.toString(),
                                                 fontSize = 12.sp,
@@ -2638,12 +2631,12 @@ fun GalleryScreen(
                                         }
                                         // Comments Tracker
                                         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
-                                            Text("💬 Comments", fontSize = 10.sp, color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                                            Text("💬 Comments", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                                             Text(
                                                 text = if (clip.commentsCount >= 1000) String.format("%.1fk", clip.commentsCount / 1000.0) else clip.commentsCount.toString(),
                                                 fontSize = 12.sp,
                                                 fontWeight = FontWeight.Black,
-                                                color = MiuixTheme.colorScheme.secondary
+                                                color = MaterialTheme.colorScheme.secondary
                                             )
                                         }
                                     }
@@ -2661,7 +2654,7 @@ fun GalleryScreen(
                 text = "PORTED MULTIMEDIA TIMELINE (${postedClips.size} CLIPS)",
                 style = MaterialTheme.typography.labelSmall.copy(
                     fontWeight = FontWeight.Bold,
-                    color = MiuixTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.primary,
                     letterSpacing = 1.sp
                 )
             )
@@ -2680,12 +2673,12 @@ fun GalleryScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "No fully processed clips available yet.",
-                            color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                             fontSize = 12.sp
                         )
                         Text(
                             text = "Enqueue and render cloud assets in Monitor/Queue.",
-                            color = MiuixTheme.colorScheme.primary,
+                            color = MaterialTheme.colorScheme.primary,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -2696,20 +2689,20 @@ fun GalleryScreen(
             items(postedClips) { clip ->
                 val isCurrent = selectedClip?.id == clip.id
                 Card(
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                    shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 4.dp)
                         .border(
-                            if (isCurrent) 3.dp else 2.dp,
-                            if (isCurrent) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.outline,
+                            if (isCurrent) 3.dp else 2.dp, 
+                            if (isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline, 
                             RoundedCornerShape(12.dp)
                         )
-                        .clickable {
+                        .clickable { 
                             selectedClip = clip
                             isPlaying = true
-                        },
-                    cornerRadius = 12.dp,
-                    colors = CardDefaults.defaultColors(color = Color.Transparent)
+                        }
                 ) {
                     VideoFirstFrameSurface(
                         videoName = clip.originalName,
@@ -2738,9 +2731,9 @@ fun GalleryScreen(
                             ) {
                                 Text(text = "🎬", fontSize = 20.sp)
                             }
-
+                            
                             Spacer(modifier = Modifier.width(12.dp))
-
+                            
                             // Video metadata texts
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
@@ -2755,7 +2748,7 @@ fun GalleryScreen(
                                     Text(
                                         text = clip.socialPlatform,
                                         fontSize = 11.sp,
-                                        color = MiuixTheme.colorScheme.primaryContainer,
+                                        color = MaterialTheme.colorScheme.primaryContainer,
                                         fontWeight = FontWeight.Bold
                                     )
                                     Text(
@@ -2804,9 +2797,9 @@ fun GalleryScreen(
                                     }
                                 }
                             }
-
+                            
                             Spacer(modifier = Modifier.width(8.dp))
-
+                            
                             // Open telemetry HUD drawer
                             IconButton(
                                 onClick = { onJobClick(clip) },
@@ -2815,8 +2808,8 @@ fun GalleryScreen(
                                     .background(Color.White.copy(alpha = 0.15f), CircleShape)
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.Info,
-                                    contentDescription = "View telemetry",
+                                    imageVector = Icons.Default.Info, 
+                                    contentDescription = "View telemetry", 
                                     tint = Color.White,
                                     modifier = Modifier.size(16.dp)
                                 )

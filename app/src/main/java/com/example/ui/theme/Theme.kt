@@ -1,56 +1,50 @@
 package com.example.ui.theme
 
+import android.os.Build
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.theme.lightColorScheme
+import androidx.compose.ui.platform.LocalContext
 
-// Retro-Modern Technical Styling palette mapped onto Miuix color tokens.
-// MiuixTheme's color scheme is the source of truth across the app.
-private val RetroMiuixColors = lightColorScheme(
-    primary = RetroMagenta,
-    onPrimary = Color.White,
-    primaryVariant = RetroMagenta,
-    onPrimaryVariant = RetroLightMagenta,
+// We target the Retro-Modern Technical Styling from the Tensor G5 Inherent TPU Bench image
+private val RetroTechnicalColorScheme = lightColorScheme(
+    primary = RetroMagenta,            // Vibrant Magenta Accent Focus
+    secondary = RetroBlue,             // Robust Retro Electric Blue Accent
+    tertiary = RetroViolet,            // Conformer Violet Accent
+    background = RetroCream,           // Warm Antique Paper Cream Canvas
+    surface = RetroPaper,              // Block Frame Solid Fill Paper Tone
     primaryContainer = RetroLightMagenta,
-    onPrimaryContainer = RetroMagenta,
-    secondary = RetroBlue,
-    onSecondary = Color.White,
-    secondaryVariant = RetroLightBlue,
-    onSecondaryVariant = RetroCharcoal,
     secondaryContainer = RetroLightBlue,
-    onSecondaryContainer = RetroBlue,
-    secondaryContainerVariant = RetroLightBlue,
-    onSecondaryContainerVariant = RetroCharcoal,
-    tertiaryContainer = RetroLightViolet,
-    onTertiaryContainer = RetroViolet,
-    tertiaryContainerVariant = RetroLightViolet,
-    background = RetroCream,
-    onBackground = RetroCharcoal,
-    onBackgroundVariant = RetroCharcoal.copy(alpha = 0.6f),
-    surface = RetroPaper,
+    onPrimary = Color.White,
+    onSecondary = Color.White,
+    onTertiary = Color.White,
+    onBackground = RetroCharcoal,       // Industrial Black Text & Graphics
     onSurface = RetroCharcoal,
-    surfaceVariant = RetroPaper,
-    onSurfaceSecondary = RetroCharcoal.copy(alpha = 0.8f),
-    onSurfaceVariantSummary = RetroCharcoal.copy(alpha = 0.7f),
-    onSurfaceVariantActions = RetroCharcoal.copy(alpha = 0.5f),
-    surfaceContainer = RetroPaper,
-    onSurfaceContainer = RetroCharcoal,
-    onSurfaceContainerVariant = RetroCharcoal.copy(alpha = 0.6f),
-    surfaceContainerHigh = RetroPaper,
-    onSurfaceContainerHigh = RetroCharcoal,
-    surfaceContainerHighest = RetroPaper,
-    onSurfaceContainerHighest = RetroCharcoal,
-    outline = RetroCharcoal,
-    dividerLine = RetroCharcoal.copy(alpha = 0.15f),
+    onSurfaceVariant = RetroCharcoal.copy(alpha = 0.7f),
+    outline = RetroCharcoal              // Clean Bold Outer Boundaries
 )
+
+// To maintain consistency with the uploaded document design asset, we enforce this beautiful,
+// high-contrast technical layout style.
+private val DarkColorScheme = RetroTechnicalColorScheme
+private val LightColorScheme = RetroTechnicalColorScheme
 
 @Composable
 fun MyApplicationTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    dynamicColor: Boolean = false, // Enforce strict brand retro themes
     content: @Composable () -> Unit,
 ) {
-    MiuixTheme(
-        colors = RetroMiuixColors,
-        content = content,
+    val colorScheme = RetroTechnicalColorScheme
+
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = Typography,
+        content = content
     )
 }

@@ -43,7 +43,7 @@ haze = "0.6.0"
 media3 = "1.4.1"
 seeker = "1.2.2"
 vico = "1.15.0"
-miuix = "0.8.8"
+miuix = "0.4.3"
 
 [libraries]
 haze = { group = "dev.chrisbanes.haze", name = "haze", version.ref = "haze" }
@@ -105,7 +105,7 @@ vico-core = { group = "com.patrykandpatrick.vico", name = "core", version.ref = 
 vico-compose = { group = "com.patrykandpatrick.vico", name = "compose", version.ref = "vico" }
 vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
 
-miuix = { group = "top.yukonga.miuix.kmp", name = "miuix-android", version.ref = "miuix" }
+miuix = { group = "top.niunai.miuix", name = "miuix-ui", version.ref = "miuix" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
