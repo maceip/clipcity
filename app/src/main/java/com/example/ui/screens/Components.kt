@@ -11,7 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +39,15 @@ import dev.chrisbanes.haze.hazeChild
 import dev.chrisbanes.haze.HazeStyle
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
+import top.yukonga.miuix.kmp.basic.Card
+import top.yukonga.miuix.kmp.basic.CardDefaults
+import top.yukonga.miuix.kmp.basic.Button
+import top.yukonga.miuix.kmp.basic.ButtonDefaults
+import top.yukonga.miuix.kmp.basic.Text
+import top.yukonga.miuix.kmp.basic.Icon
+import top.yukonga.miuix.kmp.basic.IconButton
+import top.yukonga.miuix.kmp.basic.Slider
+import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 fun MetricGaugeCard(
@@ -49,10 +58,10 @@ fun MetricGaugeCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(20.dp),
         modifier = modifier
-            .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f), RoundedCornerShape(20.dp))
+            .border(1.dp, MiuixTheme.colorScheme.outline.copy(alpha = 0.6f), RoundedCornerShape(20.dp)),
+        cornerRadius = 20.dp,
+        colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier
@@ -68,7 +77,7 @@ fun MetricGaugeCard(
                     text = title.uppercase(),
                     style = MaterialTheme.typography.labelSmall.copy(
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                         letterSpacing = 1.sp
                     )
                 )
@@ -80,14 +89,14 @@ fun MetricGaugeCard(
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.Black,
                     fontFamily = FontFamily.Monospace,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MiuixTheme.colorScheme.onSurface
                 )
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = subValue,
                 style = MaterialTheme.typography.bodySmall.copy(
-                    color = MaterialTheme.colorScheme.primary,
+                    color = MiuixTheme.colorScheme.primary,
                     fontWeight = FontWeight.Medium
                 )
             )
@@ -103,7 +112,7 @@ fun GlowingCircleIndicator(
     size: Dp = 105.dp
 ) {
     var rotationAngle by remember { mutableStateOf(0f) }
-    
+
     LaunchedEffect(statusText) {
         while (true) {
             kotlinx.coroutines.delay(20)
@@ -111,9 +120,9 @@ fun GlowingCircleIndicator(
         }
     }
 
-    val primaryColor = MaterialTheme.colorScheme.primary
-    val secondaryColor = MaterialTheme.colorScheme.secondary
-    val tertiaryColor = MaterialTheme.colorScheme.tertiary
+    val primaryColor = MiuixTheme.colorScheme.primary
+    val secondaryColor = MiuixTheme.colorScheme.secondary
+    val tertiaryColor = MiuixTheme.colorScheme.onTertiaryContainer
     val ringColor = primaryColor.copy(alpha = 0.2f)
 
     Box(
@@ -138,17 +147,17 @@ fun GlowingCircleIndicator(
             // 2. Draw 40 Segmented Ticks styled exactly like in the reference images (dials)
             val ticksCount = 40
             val activeTicks = (progress * ticksCount).toInt()
-            
+
             for (i in 0 until ticksCount) {
                 val angleDeg = (i * 360f / ticksCount) - 90f
                 val angleRad = Math.toRadians(angleDeg.toDouble())
-                
+
                 val startR = radius - 8.dp.toPx()
                 val endR = radius
-                
+
                 val startX = (center + startR * Math.cos(angleRad)).toFloat()
                 val startY = (center + startR * Math.sin(angleRad)).toFloat()
-                
+
                 val endX = (center + endR * Math.cos(angleRad)).toFloat()
                 val endY = (center + endR * Math.sin(angleRad)).toFloat()
 
@@ -182,19 +191,19 @@ fun GlowingCircleIndicator(
                     .size(16.dp)
                     .background(
                         color = (when {
-                            progress < 0.4f -> MaterialTheme.colorScheme.primary
-                            progress < 0.8f -> MaterialTheme.colorScheme.secondary
-                            else -> MaterialTheme.colorScheme.tertiary
+                            progress < 0.4f -> MiuixTheme.colorScheme.primary
+                            progress < 0.8f -> MiuixTheme.colorScheme.secondary
+                            else -> MiuixTheme.colorScheme.onTertiaryContainer
                         }).copy(alpha = 0.3f),
                         shape = CircleShape
                     )
                     .border(
-                        1.5.dp, 
+                        1.5.dp,
                         when {
-                            progress < 0.4f -> MaterialTheme.colorScheme.primary
-                            progress < 0.8f -> MaterialTheme.colorScheme.secondary
-                            else -> MaterialTheme.colorScheme.tertiary
-                        }, 
+                            progress < 0.4f -> MiuixTheme.colorScheme.primary
+                            progress < 0.8f -> MiuixTheme.colorScheme.secondary
+                            else -> MiuixTheme.colorScheme.onTertiaryContainer
+                        },
                         CircleShape
                     ),
                 contentAlignment = Alignment.Center
@@ -202,7 +211,7 @@ fun GlowingCircleIndicator(
                 Box(
                     modifier = Modifier
                         .size(4.dp)
-                        .background(MaterialTheme.colorScheme.onSurface, CircleShape)
+                        .background(MiuixTheme.colorScheme.onSurface, CircleShape)
                 )
             }
             Spacer(modifier = Modifier.height(4.dp))
@@ -211,7 +220,7 @@ fun GlowingCircleIndicator(
                 style = MaterialTheme.typography.titleSmall.copy(
                     fontWeight = FontWeight.ExtraBold,
                     fontFamily = FontFamily.Monospace,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MiuixTheme.colorScheme.onSurface
                 )
             )
             Text(
@@ -219,7 +228,7 @@ fun GlowingCircleIndicator(
                 style = MaterialTheme.typography.labelSmall.copy(
                     fontSize = 7.5.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                    color = MiuixTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                     fontFamily = FontFamily.Monospace,
                     letterSpacing = 0.2.sp
                 ),
@@ -243,7 +252,7 @@ fun VideoFirstFrameSurface(
         Canvas(modifier = Modifier.matchParentSize()) {
             val w = size.width
             val h = size.height
-            
+
             // Draw stylized frame background based on name
             when {
                 videoName.contains("Sunset", ignoreCase = true) -> {
@@ -414,9 +423,9 @@ fun VideoFirstFrameSurface(
                         1 -> Color(0xFFFF9800) // orange
                         else -> Color(0xFF2E63E9) // blue
                     }
-                    
+
                     drawRect(color = baseColor)
-                    
+
                     // Draw dense tech dots grid
                     val step = 10.dp.toPx()
                     for (x in 0..(w / step).toInt()) {
@@ -440,7 +449,7 @@ fun VideoFirstFrameSurface(
                 }
             }
         }
-        
+
         // Dark translucent vignette cover to guarantee high-contrast, fully readable white overlay text on top
         Box(
             modifier = Modifier
@@ -448,13 +457,13 @@ fun VideoFirstFrameSurface(
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            Color(0x3B000000), 
+                            Color(0x3B000000),
                             Color(0x9E000000)
                         )
                     )
                 )
         )
-        
+
         // Frame contents container:
         content()
     }
@@ -466,23 +475,24 @@ fun VideoJobRow(
     onJobClick: (VideoJob) -> Unit
 ) {
     val containerShape = RoundedCornerShape(12.dp)
-    
+
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
             .border(
                 width = 2.dp,
                 color = if (job.status == "Ingesting" || job.status == "Uploading") {
-                    MaterialTheme.colorScheme.primary
+                    MiuixTheme.colorScheme.primary
                 } else {
-                    MaterialTheme.colorScheme.outline
+                    MiuixTheme.colorScheme.outline
                 },
                 shape = containerShape
             )
             .clip(containerShape)
-            .clickable { onJobClick(job) }
+            .clickable { onJobClick(job) },
+        cornerRadius = 12.dp,
+        colors = CardDefaults.defaultColors(color = Color.Transparent)
     ) {
         VideoFirstFrameSurface(
             videoName = job.originalName,
@@ -506,17 +516,17 @@ fun VideoJobRow(
                         .clip(RoundedCornerShape(8.dp))
                         .background(
                             when (job.status) {
-                                "Posted" -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.85f)
-                                "Failed" -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.85f)
-                                else -> MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.85f)
+                                "Posted" -> MiuixTheme.colorScheme.primaryContainer.copy(alpha = 0.85f)
+                                "Failed" -> MiuixTheme.colorScheme.errorContainer.copy(alpha = 0.85f)
+                                else -> MiuixTheme.colorScheme.secondaryContainer.copy(alpha = 0.85f)
                             }
                         )
                         .border(
-                            2.dp, 
+                            2.dp,
                             when (job.status) {
-                                "Posted" -> MaterialTheme.colorScheme.primary
-                                "Failed" -> MaterialTheme.colorScheme.error
-                                else -> MaterialTheme.colorScheme.secondary
+                                "Posted" -> MiuixTheme.colorScheme.primary
+                                "Failed" -> MiuixTheme.colorScheme.error
+                                else -> MiuixTheme.colorScheme.secondary
                             },
                             RoundedCornerShape(8.dp)
                         ),
@@ -535,16 +545,16 @@ fun VideoJobRow(
                         },
                         contentDescription = job.status,
                         tint = when (job.status) {
-                            "Posted" -> MaterialTheme.colorScheme.onPrimaryContainer
-                            "Failed" -> MaterialTheme.colorScheme.onErrorContainer
-                            else -> MaterialTheme.colorScheme.onSecondaryContainer
+                            "Posted" -> MiuixTheme.colorScheme.onPrimaryContainer
+                            "Failed" -> MiuixTheme.colorScheme.onErrorContainer
+                            else -> MiuixTheme.colorScheme.onSecondaryContainer
                         },
                         modifier = Modifier.size(18.dp)
                     )
                 }
-    
+
                 Spacer(modifier = Modifier.width(12.dp))
-    
+
                 // Main Details Adaptive Text colors
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
@@ -560,7 +570,7 @@ fun VideoJobRow(
                             text = job.socialPlatform,
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontWeight = FontWeight.Black,
-                                color = MaterialTheme.colorScheme.primaryContainer
+                                color = MiuixTheme.colorScheme.primaryContainer
                             )
                         )
                         Text(
@@ -578,9 +588,9 @@ fun VideoJobRow(
                         )
                     }
                 }
-    
+
                 Spacer(modifier = Modifier.width(8.dp))
-    
+
                 // Progress/Status badge in High-Density layout
                 Column(horizontalAlignment = Alignment.End) {
                     if (job.status == "Posted") {
@@ -588,7 +598,7 @@ fun VideoJobRow(
                             text = "READY",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Black,
-                                color = MaterialTheme.colorScheme.primaryContainer
+                                color = MiuixTheme.colorScheme.primaryContainer
                             )
                         )
                         Text(
@@ -603,7 +613,7 @@ fun VideoJobRow(
                             text = "ERROR",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Black,
-                                color = MaterialTheme.colorScheme.error
+                                color = MiuixTheme.colorScheme.error
                             )
                         )
                     } else {
@@ -611,7 +621,7 @@ fun VideoJobRow(
                             text = job.status.uppercase(),
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Black,
-                                color = MaterialTheme.colorScheme.secondaryContainer
+                                color = MiuixTheme.colorScheme.secondaryContainer
                             )
                         )
                         Text(
@@ -639,7 +649,7 @@ fun VideoJobOverlay(
 ) {
     val uriHandler = LocalUriHandler.current
     val scrollState = androidx.compose.foundation.rememberScrollState()
-    
+
     // Parse Gemini clipping response JSON array safely
     val clips = remember(job.geminiGeneratedHighlights) {
         val list = mutableListOf<Triple<Int, Int, String>>()
@@ -660,7 +670,7 @@ fun VideoJobOverlay(
     // Interactive Media3 Player scrubbing seek coordinates
     var scrubPosSeconds by remember { mutableStateOf(10f) }
 
-    val glassModifier = Modifier.background(MaterialTheme.colorScheme.surface)
+    val glassModifier = Modifier.background(MiuixTheme.colorScheme.surface)
 
     var dragOffsetY by remember { mutableStateOf(0f) }
 
@@ -684,7 +694,7 @@ fun VideoJobOverlay(
                 )
             }
             .then(glassModifier)
-            .border(width = 3.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+            .border(width = 3.dp, color = MiuixTheme.colorScheme.outline, shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
     ) {
         Column(
             modifier = Modifier
@@ -698,7 +708,7 @@ fun VideoJobOverlay(
                     .padding(bottom = 12.dp)
                     .width(48.dp)
                     .height(5.dp)
-                    .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), CircleShape)
+                    .background(MiuixTheme.colorScheme.outline.copy(alpha = 0.3f), CircleShape)
             )
 
             // Header
@@ -713,22 +723,22 @@ fun VideoJobOverlay(
                             text = "HIGH-PERFORMANCE INGEST PIPELINE",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary,
+                                color = MiuixTheme.colorScheme.primary,
                                 letterSpacing = 1.2.sp
                             )
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Box(
                             modifier = Modifier
-                                .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(4.dp))
-                                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(4.dp))
+                                .background(MiuixTheme.colorScheme.primaryContainer, RoundedCornerShape(4.dp))
+                                .border(1.dp, MiuixTheme.colorScheme.outline, RoundedCornerShape(4.dp))
                                 .padding(horizontal = 6.dp, vertical = 2.dp)
                         ) {
                             Text(
                                 text = job.videoFormat,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Black,
-                                color = MaterialTheme.colorScheme.primary
+                                color = MiuixTheme.colorScheme.primary
                             )
                         }
                     }
@@ -736,15 +746,15 @@ fun VideoJobOverlay(
                         text = job.originalName,
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.Black,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MiuixTheme.colorScheme.onSurface
                         )
                     )
                 }
                 IconButton(
                     onClick = onClose,
-                    modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
+                    modifier = Modifier.background(MiuixTheme.colorScheme.primaryContainer, CircleShape)
                 ) {
-                    Icon(imageVector = Icons.Default.Close, contentDescription = "Close overlay", tint = MaterialTheme.colorScheme.primary)
+                    Icon(imageVector = Icons.Default.Close, contentDescription = "Close overlay", tint = MiuixTheme.colorScheme.primary)
                 }
             }
 
@@ -757,7 +767,7 @@ fun VideoJobOverlay(
                     .fillMaxWidth()
                     .height(130.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
+                    .border(2.dp, MiuixTheme.colorScheme.outline, RoundedCornerShape(12.dp))
             ) {
                 Box(
                     modifier = Modifier
@@ -791,11 +801,11 @@ fun VideoJobOverlay(
             ) {
                 // Status Ingest Circle Indicator Card
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
+                        .border(2.dp, MiuixTheme.colorScheme.outline, RoundedCornerShape(12.dp)),
+                    cornerRadius = 12.dp,
+                    colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.surface)
                 ) {
                     Row(
                         modifier = Modifier
@@ -857,11 +867,11 @@ fun VideoJobOverlay(
 
                 // CodecDB Chipset Optimization Card
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = Color(0x1A14122B)),
-                    shape = RoundedCornerShape(16.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, Color(0x33CA9EFF), RoundedCornerShape(16.dp))
+                        .border(1.dp, Color(0x33CA9EFF), RoundedCornerShape(16.dp)),
+                    cornerRadius = 16.dp,
+                    colors = CardDefaults.defaultColors(color = Color(0x1A14122B))
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -893,11 +903,11 @@ fun VideoJobOverlay(
 
                 // Media3 AI Effects Card (Studio Sound + Magic Eraser)
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = Color(0x1A14122B)),
-                    shape = RoundedCornerShape(16.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, Color(0x33CA9EFF), RoundedCornerShape(16.dp))
+                        .border(1.dp, Color(0x33CA9EFF), RoundedCornerShape(16.dp)),
+                    cornerRadius = 16.dp,
+                    colors = CardDefaults.defaultColors(color = Color(0x1A14122B))
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -921,7 +931,12 @@ fun VideoJobOverlay(
                                 text = "AI Status: ACTIVE (optimized for GPU)",
                                 style = MaterialTheme.typography.bodySmall.copy(color = Color(0xFF22C55E), fontWeight = FontWeight.Bold)
                             )
-                            Badge(containerColor = Color(0xFF15803D)) {
+                            // Miuix has no Badge component; emulate visual with a Box pill.
+                            Box(
+                                modifier = Modifier
+                                    .background(Color(0xFF15803D), RoundedCornerShape(8.dp))
+                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                            ) {
                                 Text(text = "HW ON", fontSize = 8.sp, color = Color.White, fontWeight = FontWeight.Black)
                             }
                         }
@@ -940,11 +955,11 @@ fun VideoJobOverlay(
 
                 // Smart Gemini AI Clipper highlights list
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = Color(0x12FFFFFF)),
-                    shape = RoundedCornerShape(18.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, Color(0x1ACA9EFF), RoundedCornerShape(18.dp))
+                        .border(1.dp, Color(0x1ACA9EFF), RoundedCornerShape(18.dp)),
+                    cornerRadius = 18.dp,
+                    colors = CardDefaults.defaultColors(color = Color(0x12FFFFFF))
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -1014,11 +1029,11 @@ fun VideoJobOverlay(
 
                 // Custom ExoPlayer-integrated rendering seek engine
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = Color(0x15FFFFFF)),
-                    shape = RoundedCornerShape(18.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, Color(0x1ACA9EFF), RoundedCornerShape(18.dp))
+                        .border(1.dp, Color(0x1ACA9EFF), RoundedCornerShape(18.dp)),
+                    cornerRadius = 18.dp,
+                    colors = CardDefaults.defaultColors(color = Color(0x15FFFFFF))
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {
                         Row(
@@ -1048,12 +1063,7 @@ fun VideoJobOverlay(
                         Slider(
                             value = scrubPosSeconds,
                             onValueChange = { scrubPosSeconds = it },
-                            valueRange = 0f..job.durationSeconds.toFloat(),
-                            colors = SliderDefaults.colors(
-                                thumbColor = Color(0xFFD0BCFF),
-                                activeTrackColor = Color(0xFF9333EA),
-                                inactiveTrackColor = Color(0x33CA9EFF)
-                            )
+                            valueRange = 0f..job.durationSeconds.toFloat()
                         )
                         Row(
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -1109,8 +1119,8 @@ fun VideoJobOverlay(
                     if (job.status == "Failed") {
                         Spacer(modifier = Modifier.height(10.dp))
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.errorContainer)
                         ) {
                             Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Text(text = "⚠️", fontSize = 18.sp)
@@ -1118,7 +1128,7 @@ fun VideoJobOverlay(
                                 Text(
                                     text = "Pipeline Error: ${job.failureReason ?: "Decoder Hardware failure."}",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onErrorContainer
+                                    color = MiuixTheme.colorScheme.onErrorContainer
                                 )
                             }
                         }
@@ -1138,13 +1148,13 @@ fun VideoJobOverlay(
                     }
                 },
                 enabled = job.status == "Posted" || job.status == "Failed",
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (job.status == "Posted") Color(0xFF21005D) else MaterialTheme.colorScheme.primary
-                ),
-                shape = RoundedCornerShape(14.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp)
+                    .height(52.dp),
+                cornerRadius = 14.dp,
+                colors = ButtonDefaults.buttonColors(
+                    color = if (job.status == "Posted") Color(0xFF21005D) else MiuixTheme.colorScheme.primary
+                )
             ) {
                 Icon(
                     imageVector = if (job.status == "Posted") Icons.Default.Share else Icons.Default.Refresh,
@@ -1185,8 +1195,8 @@ fun PipelineStepItem(
                 .background(
                     when {
                         isCompleted -> Color(0xFF2E7D32)
-                        isActive -> MaterialTheme.colorScheme.primary
-                        else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+                        isActive -> MiuixTheme.colorScheme.primary
+                        else -> MiuixTheme.colorScheme.onSurface.copy(alpha = 0.2f)
                     }
                 )
         )
@@ -1196,13 +1206,13 @@ fun PipelineStepItem(
                 text = title,
                 style = MaterialTheme.typography.bodySmall.copy(
                     fontWeight = if (isActive) FontWeight.Bold else FontWeight.Medium,
-                    color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = if (isCompleted) 0.6f else 1f)
+                    color = if (isActive) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.onSurface.copy(alpha = if (isCompleted) 0.6f else 1f)
                 )
             )
             if (isActive) {
                 Text(
                     text = subText,
-                    style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f))
+                    style = MaterialTheme.typography.labelSmall.copy(color = MiuixTheme.colorScheme.primary.copy(alpha = 0.8f))
                 )
             }
         }
